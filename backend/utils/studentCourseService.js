@@ -143,9 +143,75 @@ async function getPendingLessons(userId) {
   return pending;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Service: buildLessonPool
+//
+// Builds a MASTER LESSON POOL — a flat list of every pending lesson across
+// ALL courses the student is enrolled in.
+//
+// Steps:
+//   1. Fetch all StudentCourse entries for this user (with populated Course)
+//   2. For each enrollment, read → courseId, completedLessons, course.topics
+//   3. Filter topics NOT yet completed
+//   4. Map each pending topic to the lesson-pool shape
+//
+// Output shape:
+//   [
+//     { courseId, lessonId, title, duration },
+//     ...
+//   ]
+//
+// Notes:
+//   • lessonId  = topic._id (same value stored in completedLessons)
+//   • duration  = topic.estimatedHours converted to minutes, OR 10 min default
+//                 (estimatedHours × 60; falls back to 10 if field is absent)
+//   • Covers lessons from multiple enrolled courses in one call.
+//
+// ─────────────────────────────────────────────────────────────────────────────
+async function buildLessonPool(userId) {
+  // Step 1 – Fetch all StudentCourse enrollments (course fully populated)
+  const enrollments = await getSelectedCoursesWithEnrollment(userId);
+
+  const lessonPool = [];
+
+  enrollments.forEach((sc) => {
+    const course        = sc.courseId;                       // populated Course doc
+    const completedSet  = new Set(sc.completedLessons || []); // O(1) lookup
+    const allTopics     = course.topics || [];
+
+    // Step 2 – Keep only topics NOT already completed
+    const pendingTopics = allTopics.filter(
+      (topic) => !completedSet.has(String(topic._id))
+    );
+
+    // Step 3 – Map to lesson-pool shape
+    pendingTopics.forEach((topic) => {
+      lessonPool.push({
+        courseId: String(course._id),
+
+        // lessonId = the topic's _id (same string stored in completedLessons)
+        lessonId: String(topic._id),
+
+        title: topic.title,
+
+        // duration in minutes:
+        //   estimatedHours is stored in the schema; convert → minutes.
+        //   Default to 10 minutes when the field is missing or zero.
+        duration:
+          topic.estimatedHours && topic.estimatedHours > 0
+            ? Math.round(topic.estimatedHours * 60)
+            : 10,
+      });
+    });
+  });
+
+  return lessonPool;
+}
+
 module.exports = {
   getSelectedCourses,
   getSelectedCourseIds,
   getSelectedCoursesWithEnrollment,
   getPendingLessons,
+  buildLessonPool,
 };

@@ -217,65 +217,92 @@ exports.generateSmartSchedule = async (req, res) => {
       priority:        'deadline',
     };
 
-    // ── 2. Fetch ONLY student's selected courses from StudentCourse ──────────
-    // ⚠️  RULE: scheduling ONLY uses "My Courses" — never all courses
-    const { selectedCourseIds } = req.body; 
-    
+    // ── 2. TASK 7: Load existing schedule ─────────────────────────────────
+    //    Extract completed topicIds + preserve days that have finished tasks.
+    //    These days are merged BACK into the new schedule so progress is kept.
+    const existingSchedule = await DynamicSchedule.findOne({ userId });
+    const isRegeneration   = !!existingSchedule;
+
+    // completedTopicIds: UNION of both sources
+    //   Source A — StudentCourse.completedLessons  (persisted DB flag)
+    //   Source B — DynamicSchedule task.status === 'completed'  (in-schedule mark)
+    const completedTopicIds = new Set();
+    const preservedDays     = []; // days that already have ≥1 completed/missed task
+
+    if (existingSchedule) {
+      existingSchedule.days.forEach((day) => {
+        let hasFinished = false;
+        day.tasks.forEach((task) => {
+          if (task.status === 'completed') {
+            if (task.topicId) completedTopicIds.add(String(task.topicId));
+            hasFinished = true;
+          }
+          if (task.status === 'missed') hasFinished = true;
+        });
+        // ✅ Preserve the entire day if any task was finished
+        if (hasFinished) preservedDays.push(day.toObject ? day.toObject() : day);
+      });
+    }
+
+    // ── 3. Fetch ONLY student's selected courses ──────────────────────────
+    const { selectedCourseIds } = req.body;
     const query = { studentId: userId };
     if (selectedCourseIds && Array.isArray(selectedCourseIds) && selectedCourseIds.length > 0) {
-      // Specifically filter the StudentCourse results to only include the dropdown selection
       query.courseId = { $in: selectedCourseIds };
     }
 
-    const myStudentCourses = await StudentCourse.find(query)
-      .populate('courseId');
-    const courses = myStudentCourses
-      .map((sc) => sc.courseId)
-      .filter(Boolean); // skip any whose course was deleted
+    const myStudentCourses = await StudentCourse.find(query).populate('courseId');
 
-    // ── 3. Collect pending topics (Task 4: auto-detect difficulty) ───────────
-    const pending = [];
+    // Source A: add StudentCourse.completedLessons into the completed set
+    myStudentCourses.forEach((sc) => {
+      (sc.completedLessons || []).forEach((id) => completedTopicIds.add(String(id)));
+    });
+
+    // ── 4. Build pending list — filter completed + DEDUPLICATE ────────────
+    //    ❌ TASK 7: Remove duplicates — same topicId from multiple course entries
+    //    🚫 TASK 7: Completed topics from EITHER source are never re-assigned
+    const pending      = [];
+    const seenTopicIds = new Set();
+
     myStudentCourses.forEach((studentCourse) => {
       const course = studentCourse.courseId;
       if (!course) return;
 
-      const completedTopics = studentCourse.completedLessons || [];
-
       course.topics.forEach((topic) => {
-        // A topic is "pending" if it has NOT been marked completed yet
-        if (!completedTopics.includes(topic._id.toString())) {
-          // getDifficulty() inspects the topic title against keyword map
-          const difficulty = getDifficulty(topic.title);
+        const tid = String(topic._id);
 
-          pending.push({
-            courseId:       course._id,
-            courseName:     course.courseName,
-            topicId:        topic._id,
-            title:          topic.title,
-            youtubeUrl:     topic.youtubeUrl || '',
-            deadline:       topic.deadline,
-            estimatedHours: topic.estimatedHours,
-            originalHours:  topic.estimatedHours,
-            allocatedHours: topic.estimatedHours,
-            difficulty,   // ← NEW: stored in DynamicSchedule task, shown in UI
-          });
-        }
+        // 🚫 Skip if completed in ANY source
+        if (completedTopicIds.has(tid)) return;
+
+        // ❌ Skip duplicates
+        if (seenTopicIds.has(tid)) return;
+        seenTopicIds.add(tid);
+
+        const difficulty = getDifficulty(topic.title);
+        pending.push({
+          courseId:       course._id,
+          courseName:     course.courseName,
+          topicId:        topic._id,
+          title:          topic.title,
+          youtubeUrl:     topic.youtubeUrl || '',
+          deadline:       topic.deadline,
+          estimatedHours: topic.estimatedHours,
+          originalHours:  topic.estimatedHours,
+          allocatedHours: topic.estimatedHours,
+          difficulty,
+        });
       });
     });
 
-    // ── 4. Sort by priority ───────────────────────────────────────────────
+    // ── 5. Sort by priority ───────────────────────────────────────────────
     if (avail.priority === 'deadline') {
-      // Most urgent first
       pending.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
 
     } else if (avail.priority === 'difficulty') {
-      // ── Task 4: Easy → Medium → Hard progression ────────────────────────
-      // Primary: difficulty order (Easy=1, Medium=2, Hard=3)
-      // Secondary: deadline (so topics of same difficulty are deadline-sorted)
       pending.sort((a, b) => {
         const da = DIFFICULTY_ORDER[a.difficulty] || 2;
         const db = DIFFICULTY_ORDER[b.difficulty] || 2;
-        if (da !== db) return da - db; // Easy before Medium before Hard
+        if (da !== db) return da - db;
         return new Date(a.deadline) - new Date(b.deadline);
       });
       console.log(`[generateSmart] Difficulty sort: ${
@@ -299,33 +326,106 @@ exports.generateSmartSchedule = async (req, res) => {
       pending.splice(0, pending.length, ...balanced);
     }
 
-    // ── 5. Run the scheduling algorithm ──────────────────────────────────
-    const days = buildSchedule(
+    // ── 6. 🔁 TASK 7: Shuffle on regeneration — guarantees a NEW order ────
+    //    Fisher-Yates shuffle applied only when an existing schedule is found.
+    //    This ensures re-generation never produces the exact same sequence.
+    if (isRegeneration) {
+      for (let i = pending.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pending[i], pending[j]] = [pending[j], pending[i]];
+      }
+    }
+
+    // ── 7. Run the scheduling algorithm ──────────────────────────────────
+    const newDays = buildSchedule(
       pending,
       avail.weeklyHours,
       avail.sessionDuration,
       new Date()
     );
 
-    // ── 6. Upsert the DynamicSchedule document ────────────────────────────
+    // ── 8. ✅ TASK 7: Merge preserved completed days + freshly scheduled days
+    //    Preserved days (historical progress) come first, new pending come after.
+    const mergedDays = [...preservedDays, ...newDays];
+
+    // ── 9. Upsert the DynamicSchedule document ────────────────────────────
     const saved = await DynamicSchedule.findOneAndUpdate(
       { userId },
       {
         generatedAt:       new Date(),
         totalPendingTasks: pending.length,
-        days,
+        days:              mergedDays,
       },
       { new: true, upsert: true, setDefaultsOnInsert: true }
     );
 
-    console.log(`[generateSmart] User:${userId} → ${days.length} days, ${pending.length} tasks`);
+    console.log(
+      `[generateSmart] User:${userId} → ${newDays.length} new days, ` +
+      `${pending.length} pending topics, ${preservedDays.length} preserved days, ` +
+      `${completedTopicIds.size} completed topics skipped`
+    );
 
     res.json({
-      message:   `Schedule generated: ${days.length} study days across ${pending.length} topics`,
-      schedule:  saved,
+      message:  `Schedule generated: ${newDays.length} study days across ${pending.length} topics`,
+      schedule: saved,
     });
   } catch (err) {
     console.error('generateSmartSchedule error:', err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/schedule/complete-topic
+// Mark ALL scheduled slots of a given topic (by topicId) as 'completed'.
+//
+// Unlike PATCH /task/:taskId which targets a single task _id,
+// this endpoint marks by topicId — useful when a topic spans multiple
+// split-day slots and you want to complete all of them at once.
+//
+// Body: { topicId: "<topic _id>" }
+// ─────────────────────────────────────────────────────────────────────────────
+exports.markTopicComplete = async (req, res) => {
+  try {
+    const userId            = req.user.id;
+    const { topicId }       = req.body;
+
+    if (!topicId) {
+      return res.status(400).json({ message: 'topicId is required in request body.' });
+    }
+
+    const schedule = await DynamicSchedule.findOne({ userId });
+    if (!schedule) {
+      return res.status(404).json({ message: 'No schedule found. Generate one first.' });
+    }
+
+    let markedCount = 0;
+    schedule.days.forEach((day) => {
+      day.tasks.forEach((task) => {
+        // Match by topicId field (stored as ObjectId — compare as String)
+        if (String(task.topicId) === String(topicId) && task.status === 'pending') {
+          task.status = 'completed';
+          markedCount++;
+        }
+      });
+    });
+
+    if (markedCount === 0) {
+      return res.status(404).json({
+        message: 'Topic not found in any pending slot, or already completed.',
+      });
+    }
+
+    schedule.markModified('days');
+    await schedule.save();
+
+    res.json({
+      message:     `Topic marked as completed in ${markedCount} scheduled slot(s).`,
+      topicId,
+      markedCount,
+    });
+  } catch (err) {
+    console.error('markTopicComplete error:', err);
     res.status(500).json({ message: 'Server Error' });
   }
 };

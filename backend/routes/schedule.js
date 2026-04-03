@@ -27,4 +27,8 @@ router.post('/generate-smart', dynamicCtrl.generateSmartSchedule);
 // PATCH /api/schedule/task/:taskId
 router.patch('/task/:taskId', dynamicCtrl.updateTaskStatus);
 
+// ── Task 7: Topic-level completion (marks ALL slots of a topic as done) ────────
+// POST /api/schedule/complete-topic
+router.post('/complete-topic', dynamicCtrl.markTopicComplete);
+
 module.exports = router;

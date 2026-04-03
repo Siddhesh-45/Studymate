@@ -1,0 +1,22 @@
+# ── Environment variables (NEVER commit these) ──────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Node dependencies ────────────────────────────────────────────────────────
+node_modules/
+**/node_modules/
+
+# ── Build output ─────────────────────────────────────────────────────────────
+dist/
+build/
+.vite/
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+logs/
+
+# ── OS files ─────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
