@@ -11,6 +11,9 @@ router.use(auth);
 // GET /api/schedule/generate
 router.get('/generate', scheduleCtrl.generateSchedule);
 
+// POST /api/schedule/regenerate -> Task 8 smart regeneration
+router.post('/regenerate', scheduleCtrl.regenerateSchedule);
+
 // ── Availability (student's weekly time profile) ──────────────────────────────
 // GET  /api/schedule/availability   → load saved availability
 // POST /api/schedule/availability   → save / update availability
@@ -30,5 +33,9 @@ router.patch('/task/:taskId', dynamicCtrl.updateTaskStatus);
 // ── Task 7: Topic-level completion (marks ALL slots of a topic as done) ────────
 // POST /api/schedule/complete-topic
 router.post('/complete-topic', dynamicCtrl.markTopicComplete);
+
+// ── Task 8: Performance tracking (correct / wrong per topic) ────────────────────
+// POST /api/schedule/update-performance
+router.post('/update-performance', dynamicCtrl.updatePerformance);
 
 module.exports = router;

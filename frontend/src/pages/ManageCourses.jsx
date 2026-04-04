@@ -14,7 +14,7 @@ function Toast({ toasts, removeToast }) {
           <span style={{ fontSize: '16px' }}>
             {t.type === 'success' ? '✅' : t.type === 'warn' ? '⚠️' : '❌'}
           </span>
-          <span style={{ flex: 1, fontSize: '13px', color: '#e2e8f0' }}>{t.message}</span>
+          <span style={{ flex: 1, fontSize: '13px', color: 'var(--sm-text, #e2e8f0)' }}>{t.message}</span>
           <button onClick={() => removeToast(t.id)} style={S.toastClose}>×</button>
         </div>
       ))}
@@ -86,7 +86,7 @@ export default function ManageCourses() {
   const DIFF_COLORS = {
     easy:   { bg: 'rgba(34, 197, 94, 0.15)',  col: '#86efac', border: 'rgba(34, 197, 94, 0.3)' },
     medium: { bg: 'rgba(234, 179, 8, 0.15)',  col: '#fde047', border: 'rgba(234, 179, 8, 0.3)' },
-    hard:   { bg: 'rgba(239, 68, 68, 0.15)',  col: '#fca5a5', border: 'rgba(239, 68, 68, 0.3)' },
+    hard:   { bg: 'rgba(239, 68, 68, 0.15)',  col: 'var(--sm-red)', border: 'rgba(239, 68, 68, 0.3)' },
   };
 
   return (
@@ -118,8 +118,8 @@ export default function ManageCourses() {
               return (
                 <div key={course._id} style={{
                   ...S.card,
-                  borderColor: isSelected ? '#6366f1' : 'rgba(255,255,255,0.08)',
-                  background: isSelected ? 'rgba(99,102,241,0.06)' : 'rgba(255,255,255,0.03)'
+                  borderColor: isSelected ? '#6366f1' : 'var(--sm-surface-8)',
+                  background: isSelected ? 'rgba(99,102,241,0.06)' : 'var(--sm-surface-3)'
                 }}>
                   <label style={S.cardClickArea}>
                     <input 
@@ -140,7 +140,7 @@ export default function ManageCourses() {
             })}
             
             {masterCourses.length === 0 && (
-               <div style={{ padding: '20px', color: 'rgba(255,255,255,0.5)', textAlign: 'center' }}>
+               <div style={{ padding: '20px', color: 'var(--sm-surface-50)', textAlign: 'center' }}>
                  No Master Courses available yet. Admin needs to import YouTube playlists or create them.
                </div>
             )}
@@ -175,12 +175,12 @@ export default function ManageCourses() {
 const S = {
   page:         { maxWidth: '900px', margin: '0 auto', fontFamily: 'Segoe UI, sans-serif' },
   header:       { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '32px' },
-  title:        { fontSize: '28px', fontWeight: '800', color: '#f1f5f9', margin: 0, letterSpacing: '-0.5px' },
-  subtitle:     { color: 'rgba(255,255,255,0.5)', fontSize: '15px', marginTop: '6px' },
-  statPill:     { background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '20px', padding: '6px 14px', color: '#a5b4fc', fontSize: '13px', fontWeight: '600', alignSelf: 'center' },
+  title:        { fontSize: '28px', fontWeight: '800', color: 'var(--sm-text, #f1f5f9)', margin: 0, letterSpacing: '-0.5px' },
+  subtitle:     { color: 'var(--sm-surface-50)', fontSize: '15px', marginTop: '6px' },
+  statPill:     { background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '20px', padding: '6px 14px', color: 'var(--sm-indigo-muted)', fontSize: '13px', fontWeight: '600', alignSelf: 'center' },
   
-  centerState:  { textAlign: 'center', padding: '80px 20px', background: 'rgba(255,255,255,0.03)', borderRadius: '16px', border: '1px dashed rgba(255,255,255,0.1)' },
-  stateText:    { color: 'rgba(255,255,255,0.4)', fontSize: '14px' },
+  centerState:  { textAlign: 'center', padding: '80px 20px', background: 'var(--sm-surface-3)', borderRadius: '16px', border: '1px dashed var(--sm-surface-10)' },
+  stateText:    { color: 'var(--sm-surface-40)', fontSize: '14px' },
   spinnerLg:    { width: '40px', height: '40px', border: '3px solid rgba(99,102,241,0.2)', borderTopColor: '#6366f1', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' },
   
   layout:       { display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' },
@@ -191,15 +191,15 @@ const S = {
   cardClickArea:{ display: 'flex', alignItems: 'center', padding: '16px 20px', cursor: 'pointer', gap: '16px' },
   checkbox:     { width: '22px', height: '22px', accentColor: '#6366f1', cursor: 'pointer', flexShrink: 0 },
   cardContent:  { display: 'flex', justifyContent: 'space-between', alignItems: 'center', flex: 1 },
-  courseName:   { margin: 0, fontSize: '16px', fontWeight: '600', color: '#e2e8f0' },
+  courseName:   { margin: 0, fontSize: '16px', fontWeight: '600', color: 'var(--sm-text, #e2e8f0)' },
   difficultyBadge: { padding: '4px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', border: '1px solid' },
   
-  sidebarCard:  { position: 'sticky', top: '24px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '24px' },
-  sidebarTitle: { margin: '0 0 16px 0', color: '#e2e8f0', fontSize: '17px', fontWeight: '700' },
-  sidebarText:  { color: 'rgba(255,255,255,0.6)', fontSize: '14px', lineHeight: '1.5', marginBottom: '24px' },
+  sidebarCard:  { position: 'sticky', top: '24px', background: 'var(--sm-surface-4)', border: '1px solid var(--sm-surface-8)', borderRadius: '16px', padding: '24px' },
+  sidebarTitle: { margin: '0 0 16px 0', color: 'var(--sm-text, #e2e8f0)', fontSize: '17px', fontWeight: '700' },
+  sidebarText:  { color: 'var(--sm-surface-60)', fontSize: '14px', lineHeight: '1.5', marginBottom: '24px' },
   saveBtn:      { width: '100%', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', border: 'none', borderRadius: '10px', padding: '14px', color: '#fff', fontSize: '15px', fontWeight: '700', cursor: 'pointer', display: 'flex', justifyContent: 'center' },
   
   toastContainer:{ position: 'fixed', top: '20px', right: '20px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '340px' },
   toast:         { display: 'flex', alignItems: 'center', gap: '10px', backdropFilter: 'blur(12px)', border: '1px solid', borderRadius: '10px', padding: '12px 14px', boxShadow: '0 4px 20px rgba(0,0,0,0.4)', animation: 'slideIn 0.25s ease' },
-  toastClose:    { background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: 0 }
+  toastClose:    { background: 'none', border: 'none', color: 'var(--sm-surface-50)', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: 0 }
 };

@@ -31,11 +31,11 @@ const DEFAULT_HOURS = [2, 2, 2, 2, 2, 4, 4]; // Sun-Sat
 
 // Course color palette
 const COLORS = [
-  { bg:'rgba(99,102,241,.18)',  border:'rgba(99,102,241,.4)',  text:'#a5b4fc' },
-  { bg:'rgba(16,185,129,.15)',  border:'rgba(16,185,129,.35)', text:'#6ee7b7' },
-  { bg:'rgba(245,158,11,.15)',  border:'rgba(245,158,11,.35)', text:'#fcd34d' },
-  { bg:'rgba(239,68,68,.15)',   border:'rgba(239,68,68,.35)',  text:'#fca5a5' },
-  { bg:'rgba(14,165,233,.15)',  border:'rgba(14,165,233,.35)', text:'#7dd3fc' },
+  { bg:'rgba(99,102,241,.18)',  border:'rgba(99,102,241,.4)',  text:'var(--sm-indigo-muted)' },
+  { bg:'rgba(16,185,129,.15)',  border:'rgba(16,185,129,.35)', text:'var(--sm-emerald)' },
+  { bg:'rgba(245,158,11,.15)',  border:'rgba(245,158,11,.35)', text:'var(--sm-yellow)' },
+  { bg:'rgba(239,68,68,.15)',   border:'rgba(239,68,68,.35)',  text:'var(--sm-red)' },
+  { bg:'rgba(14,165,233,.15)',  border:'rgba(14,165,233,.35)', text:'var(--sm-cyan)' },
   { bg:'rgba(168,85,247,.18)',  border:'rgba(168,85,247,.4)',  text:'#d8b4fe' },
   { bg:'rgba(236,72,153,.15)',  border:'rgba(236,72,153,.35)', text:'#f9a8d4' },
   { bg:'rgba(20,184,166,.15)',  border:'rgba(20,184,166,.35)', text:'#5eead4' },
@@ -253,7 +253,7 @@ export default function Schedule() {
                   <span style={S.dayShort}>{day.short}</span>
                   <span style={{
                     ...S.dayFull,
-                    color: day.weekend ? '#fcd34d' : '#94a3b8',
+                    color: day.weekend ? 'var(--sm-yellow)' : 'var(--sm-text-sub, #94a3b8)',
                   }}>
                     {day.label}
                   </span>
@@ -269,8 +269,8 @@ export default function Schedule() {
 
                     <span style={{
                       ...S.stepVal,
-                      color: weeklyHours[day.key]===0 ? '#475569'
-                           : weeklyHours[day.key]>=3  ? '#86efac' : '#f1f5f9',
+                      color: weeklyHours[day.key]===0 ? 'var(--sm-text-muted, #475569)'
+                           : weeklyHours[day.key]>=3  ? '#86efac' : 'var(--sm-text, #f1f5f9)',
                     }}>
                       {weeklyHours[day.key]===0 ? 'OFF' : `${weeklyHours[day.key]}h`}
                     </span>
@@ -299,8 +299,8 @@ export default function Schedule() {
 
             {/* Total weekly hours */}
             <div style={S.weekTotal}>
-              <span style={{ color:'#64748b' }}>Total weekly study time:</span>
-              <span style={{ color:'#a5b4fc', fontWeight:700, fontSize:16 }}>
+              <span style={{ color:'var(--sm-text-sub)' }}>Total weekly study time:</span>
+              <span style={{ color:'var(--sm-indigo-muted)', fontWeight:700, fontSize:16 }}>
                 {weeklyHours.reduce((s,h)=>s+h,0).toFixed(1)}h / week
               </span>
             </div>
@@ -337,7 +337,7 @@ export default function Schedule() {
                 );
               })}
               {myCourses.length === 0 && (
-                <span style={{ color: '#64748b', fontSize: '13px' }}>No active courses found. Go to 'My Courses' first.</span>
+                <span style={{ color: 'var(--sm-text-sub)', fontSize: '13px' }}>No active courses found. Go to 'My Courses' first.</span>
               )}
             </div>
           </div>
@@ -398,7 +398,7 @@ export default function Schedule() {
           {availMsg && (
             <div style={{
               ...S.availMsg,
-              color: availMsg.startsWith('✅') ? '#86efac' : '#fca5a5',
+              color: availMsg.startsWith('✅') ? '#86efac' : 'var(--sm-red)',
               borderColor: availMsg.startsWith('✅') ? 'rgba(34,197,94,.25)' : 'rgba(239,68,68,.25)',
             }}>
               {availMsg}
@@ -435,7 +435,7 @@ export default function Schedule() {
           {schedLoading && (
             <div style={S.center}>
               <div style={S.spinner} />
-              <p style={{color:'#94a3b8',marginTop:14,fontSize:14}}>Loading your schedule...</p>
+              <p style={{color:'var(--sm-text-sub, #94a3b8)',marginTop:14,fontSize:14}}>Loading your schedule...</p>
             </div>
           )}
 
@@ -449,7 +449,7 @@ export default function Schedule() {
                 <StatCard icon="⏳" value={totalPending}              label="Pending"    />
                 <StatCard icon="✅" value={totalDone}                 label="Completed"  color="#86efac" />
                 {totalMissed>0 && (
-                  <StatCard icon="❌" value={totalMissed} label="Missed" color="#f87171" danger />
+                  <StatCard icon="❌" value={totalMissed} label="Missed" color="var(--sm-red-muted)" danger />
                 )}
               </div>
 
@@ -466,8 +466,8 @@ export default function Schedule() {
               {days.length===0 || totalPending===0 ? (
                 <div style={S.emptyState}>
                   <div style={{fontSize:56,marginBottom:16}}>🎉</div>
-                  <h2 style={{color:'#f1f5f9',marginBottom:8,fontSize:22}}>All caught up!</h2>
-                  <p style={{color:'#64748b',fontSize:15,marginBottom:24,maxWidth:400}}>
+                  <h2 style={{color:'var(--sm-text, #f1f5f9)',marginBottom:8,fontSize:22}}>All caught up!</h2>
+                  <p style={{color:'var(--sm-text-sub)',fontSize:15,marginBottom:24,maxWidth:400}}>
                     No pending topics. Either you've completed everything or no
                     courses have topics yet.
                   </p>
@@ -594,7 +594,7 @@ export default function Schedule() {
                                   <p style={{
                                     ...S.topicTitle,
                                     textDecoration: task.status==='completed'?'line-through':'none',
-                                    color: task.status==='completed'?'#475569':'#f1f5f9',
+                                    color: task.status==='completed'?'var(--sm-text-muted, #475569)':'var(--sm-text, #f1f5f9)',
                                   }}>
                                     {task.title}
                                   </p>
@@ -611,7 +611,7 @@ export default function Schedule() {
                                     </span>
                                     <span style={{
                                       ...S.metaChip,
-                                      color: deadPast?'#f87171':'#94a3b8',
+                                      color: deadPast?'var(--sm-red-muted)':'var(--sm-text-sub, #94a3b8)',
                                     }}>
                                       📅 {fmtDeadline(task.deadline)}
                                       {deadPast && task.status==='pending' && ' ⚠️'}
@@ -672,7 +672,7 @@ export default function Schedule() {
                                     ...S.statusBadge,
                                     background: task.status==='completed'
                                       ? 'rgba(34,197,94,.2)' : 'rgba(239,68,68,.15)',
-                                    color: task.status==='completed'?'#86efac':'#fca5a5',
+                                    color: task.status==='completed'?'#86efac':'var(--sm-red)',
                                   }}>
                                     {task.status==='completed'?'✅ Done':'❌ Missed'}
                                   </div>
@@ -693,10 +693,10 @@ export default function Schedule() {
           {!schedLoading && !schedule && !schedError && (
             <div style={S.emptyState}>
               <div style={{fontSize:52,marginBottom:16}}>📋</div>
-              <h2 style={{color:'#f1f5f9',marginBottom:8,fontSize:20}}>
+              <h2 style={{color:'var(--sm-text, #f1f5f9)',marginBottom:8,fontSize:20}}>
                 No schedule yet
               </h2>
-              <p style={{color:'#64748b',fontSize:14,marginBottom:24}}>
+              <p style={{color:'var(--sm-text-sub)',fontSize:14,marginBottom:24}}>
                 Set your availability first, then generate your personalised schedule.
               </p>
               <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
@@ -731,68 +731,68 @@ function StatCard({ icon, value, label, color, danger }) {
 // ─────────────────────────────────────────────────────────────────────────────
 const A='#6366f1', A2='#8b5cf6';
 const S = {
-  page:        { fontFamily:"'Segoe UI',system-ui,sans-serif", color:'#e2e8f0', paddingBottom:40 },
+  page:        { fontFamily:"'Segoe UI',system-ui,sans-serif", color:'var(--sm-text, #e2e8f0)', paddingBottom:40 },
   pageHeader:  { display:'flex', alignItems:'flex-start', justifyContent:'space-between',
                  marginBottom:20, flexWrap:'wrap', gap:12 },
-  pageTitle:   { fontSize:26, fontWeight:700, color:'#f1f5f9', margin:'0 0 4px' },
-  pageSubtitle:{ fontSize:14, color:'#64748b', margin:0 },
+  pageTitle:   { fontSize:26, fontWeight:700, color:'var(--sm-text, #f1f5f9)', margin:'0 0 4px' },
+  pageSubtitle:{ fontSize:14, color:'var(--sm-text-sub)', margin:0 },
 
   // Tabs
   tabBar: { display:'flex', gap:4, marginBottom:24,
-            background:'rgba(255,255,255,.04)', padding:4, borderRadius:12,
-            border:'1px solid rgba(255,255,255,.07)', width:'fit-content' },
+            background:'var(--sm-surface-4)', padding:4, borderRadius:12,
+            border:'1px solid var(--sm-surface-7)', width:'fit-content' },
   tab: { padding:'9px 20px', borderRadius:9, border:'none', background:'transparent',
-         color:'rgba(255,255,255,.5)', fontSize:14, fontWeight:500, cursor:'pointer' },
-  tabActive: { background:`rgba(99,102,241,.25)`, color:'#a5b4fc' },
+         color:'var(--sm-surface-50)', fontSize:14, fontWeight:500, cursor:'pointer' },
+  tabActive: { background:`rgba(99,102,241,.25)`, color:'var(--sm-indigo-muted)' },
 
   // Section
   section:     { display:'flex', flexDirection:'column', gap:16 },
-  sectionDesc: { color:'#64748b', fontSize:14, margin:'0 0 4px' },
+  sectionDesc: { color:'var(--sm-text-sub)', fontSize:14, margin:'0 0 4px' },
 
   // Availability card
-  availCard:   { background:'rgba(255,255,255,.04)', border:'1px solid rgba(255,255,255,.08)',
+  availCard:   { background:'var(--sm-surface-4)', border:'1px solid var(--sm-surface-8)',
                  borderRadius:16, padding:22 },
-  cardHeading: { color:'#f1f5f9', fontSize:16, fontWeight:700, margin:'0 0 4px' },
-  cardSubheading:{ color:'#64748b', fontSize:13, margin:'0 0 18px' },
+  cardHeading: { color:'var(--sm-text, #f1f5f9)', fontSize:16, fontWeight:700, margin:'0 0 4px' },
+  cardSubheading:{ color:'var(--sm-text-sub)', fontSize:13, margin:'0 0 18px' },
 
   // Days grid
   daysGrid:    { display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(120px,1fr))', gap:10 },
-  daySlot:     { background:'rgba(255,255,255,.04)', borderRadius:12, padding:12,
-                 border:'1px solid rgba(255,255,255,.08)',
+  daySlot:     { background:'var(--sm-surface-4)', borderRadius:12, padding:12,
+                 border:'1px solid var(--sm-surface-8)',
                  display:'flex', flexDirection:'column', alignItems:'center', gap:4 },
-  daySlotOff:  { background:'rgba(255,255,255,.02)', borderColor:'rgba(255,255,255,.04)', opacity:.6 },
+  daySlotOff:  { background:'var(--sm-surface-2)', borderColor:'var(--sm-surface-4)', opacity:.6 },
   daySlotWeekend:{ borderColor:'rgba(245,158,11,.2)' },
-  dayShort:    { fontSize:18, fontWeight:700, color:'#f1f5f9' },
+  dayShort:    { fontSize:18, fontWeight:700, color:'var(--sm-text, #f1f5f9)' },
   dayFull:     { fontSize:11, fontWeight:500 },
 
   // Stepper
   stepper:     { display:'flex', alignItems:'center', gap:6, margin:'4px 0' },
-  stepBtn:     { width:26, height:26, borderRadius:6, border:'1px solid rgba(255,255,255,.15)',
-                 background:'rgba(255,255,255,.07)', color:'#e2e8f0',
+  stepBtn:     { width:26, height:26, borderRadius:6, border:'1px solid var(--sm-surface-15)',
+                 background:'var(--sm-surface-7)', color:'var(--sm-text, #e2e8f0)',
                  fontSize:16, fontWeight:700, cursor:'pointer', lineHeight:'24px' },
   stepVal:     { fontSize:15, fontWeight:700, minWidth:36, textAlign:'center' },
 
   // Day bar
-  dayBarTrack: { width:'100%', height:4, background:'rgba(255,255,255,.07)', borderRadius:2 },
+  dayBarTrack: { width:'100%', height:4, background:'var(--sm-surface-7)', borderRadius:2 },
   dayBarFill:  { height:'100%', borderRadius:2, transition:'width .3s ease' },
   weekTotal:   { display:'flex', justifyContent:'space-between', alignItems:'center',
-                 marginTop:16, paddingTop:14, borderTop:'1px solid rgba(255,255,255,.07)',
-                 color:'#64748b', fontSize:14 },
+                 marginTop:16, paddingTop:14, borderTop:'1px solid var(--sm-surface-7)',
+                 color:'var(--sm-text-sub)', fontSize:14 },
 
   // Preferences
   prefRow:     { display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 },
   prefGroup:   { display:'flex', flexDirection:'column', gap:6 },
-  prefLabel:   { color:'#e2e8f0', fontSize:14, fontWeight:600 },
-  prefHint:    { color:'#64748b', fontSize:12, margin:0 },
+  prefLabel:   { color:'var(--sm-text, #e2e8f0)', fontSize:14, fontWeight:600 },
+  prefHint:    { color:'var(--sm-text-sub)', fontSize:12, margin:0 },
   prefOptions: { display:'flex', flexWrap:'wrap', gap:8, marginTop:4 },
-  prefChip:    { padding:'7px 14px', borderRadius:9, border:'1px solid rgba(255,255,255,.12)',
-                 background:'rgba(255,255,255,.05)', color:'#94a3b8',
+  prefChip:    { padding:'7px 14px', borderRadius:9, border:'1px solid var(--sm-surface-12)',
+                 background:'var(--sm-surface-5)', color:'var(--sm-text-sub, #94a3b8)',
                  fontSize:13, cursor:'pointer' },
   prefChipActive:{ background:`rgba(99,102,241,.25)`, borderColor:`rgba(99,102,241,.4)`,
-                   color:'#a5b4fc' },
+                   color:'var(--sm-indigo-muted)' },
 
   priorityExplain:{ background:'rgba(99,102,241,.08)', border:'1px solid rgba(99,102,241,.2)',
-                    borderRadius:8, padding:'10px 14px', color:'#a5b4fc',
+                    borderRadius:8, padding:'10px 14px', color:'var(--sm-indigo-muted)',
                     fontSize:13, marginTop:14 },
 
   availMsg:    { background:'rgba(34,197,94,.08)', border:'1px solid',
@@ -803,44 +803,44 @@ const S = {
                  borderRadius:10, padding:'11px 24px', color:'#fff',
                  fontSize:14, fontWeight:600, cursor:'pointer' },
   btnGenerate: { background:'rgba(99,102,241,.2)', border:'1px solid rgba(99,102,241,.35)',
-                 borderRadius:10, padding:'10px 20px', color:'#a5b4fc',
+                 borderRadius:10, padding:'10px 20px', color:'var(--sm-indigo-muted)',
                  fontSize:14, fontWeight:600, cursor:'pointer' },
-  btnDisabled: { background:'rgba(255,255,255,.07)', border:'none',
-                 borderRadius:10, padding:'10px 20px', color:'rgba(255,255,255,.3)',
+  btnDisabled: { background:'var(--sm-surface-7)', border:'none',
+                 borderRadius:10, padding:'10px 20px', color:'var(--sm-surface-30)',
                  fontSize:14, cursor:'not-allowed' },
 
   // Error / loading
   errorBanner: { background:'rgba(239,68,68,.12)', border:'1px solid rgba(239,68,68,.3)',
-                 borderRadius:10, padding:'12px 16px', color:'#fca5a5', fontSize:14,
+                 borderRadius:10, padding:'12px 16px', color:'var(--sm-red)', fontSize:14,
                  marginBottom:16, display:'flex', justifyContent:'space-between', alignItems:'center' },
-  bannerClose: { background:'none', border:'none', color:'#fca5a5', cursor:'pointer', fontSize:16 },
+  bannerClose: { background:'none', border:'none', color:'var(--sm-red)', cursor:'pointer', fontSize:16 },
   center:      { display:'flex', flexDirection:'column', alignItems:'center', padding:'60px 0' },
   spinner:     { width:40, height:40, border:'3px solid rgba(99,102,241,.2)',
                  borderTop:`3px solid ${A}`, borderRadius:'50%', animation:'spin .8s linear infinite' },
 
   // Stats
   statsRow:    { display:'flex', gap:10, marginBottom:20, flexWrap:'wrap' },
-  statCard:    { background:'rgba(255,255,255,.04)', border:'1px solid rgba(255,255,255,.08)',
+  statCard:    { background:'var(--sm-surface-4)', border:'1px solid var(--sm-surface-8)',
                  borderRadius:12, padding:'12px 18px',
                  display:'flex', flexDirection:'column', alignItems:'center', minWidth:80, gap:2 },
   statCardDanger:{ background:'rgba(239,68,68,.07)', borderColor:'rgba(239,68,68,.2)' },
   statIcon:    { fontSize:18, marginBottom:2 },
-  statValue:   { fontSize:20, fontWeight:700, color:'#f1f5f9' },
-  statLabel:   { fontSize:11, color:'#64748b', textTransform:'uppercase', letterSpacing:'.06em' },
+  statValue:   { fontSize:20, fontWeight:700, color:'var(--sm-text, #f1f5f9)' },
+  statLabel:   { fontSize:11, color:'var(--sm-text-sub)', textTransform:'uppercase', letterSpacing:'.06em' },
 
-  genTime:     { color:'#475569', fontSize:12, margin:'0 0 16px' },
-  inlineBtn:   { background:'none', border:'none', color:'#818cf8', fontSize:12,
+  genTime:     { color:'var(--sm-text-muted, #475569)', fontSize:12, margin:'0 0 16px' },
+  inlineBtn:   { background:'none', border:'none', color:'var(--sm-indigo)', fontSize:12,
                  cursor:'pointer', textDecoration:'underline', padding:0 },
 
   // Empty state
-  emptyState:  { textAlign:'center', padding:'60px 20px', background:'rgba(255,255,255,.02)',
-                 borderRadius:20, border:'1px dashed rgba(255,255,255,.1)' },
+  emptyState:  { textAlign:'center', padding:'60px 20px', background:'var(--sm-surface-2)',
+                 borderRadius:20, border:'1px dashed var(--sm-surface-10)' },
   emptyHints:  { display:'flex', flexDirection:'column', gap:8, alignItems:'center' },
-  emptyHint:   { color:'#475569', fontSize:13, margin:0 },
+  emptyHint:   { color:'var(--sm-text-muted, #475569)', fontSize:13, margin:0 },
 
   // Day cards
   dayList:     { display:'flex', flexDirection:'column', gap:16 },
-  dayCard:     { background:'rgba(255,255,255,.03)', border:'1px solid rgba(255,255,255,.07)',
+  dayCard:     { background:'var(--sm-surface-3)', border:'1px solid var(--sm-surface-7)',
                  borderRadius:16, padding:20 },
   dayCardToday:{ background:'rgba(99,102,241,.07)', border:'1px solid rgba(99,102,241,.3)',
                  boxShadow:'0 0 0 1px rgba(99,102,241,.12)' },
@@ -850,12 +850,12 @@ const S = {
   dayBadge:    { fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:20,
                  textTransform:'uppercase', letterSpacing:'.06em' },
   dayBadgeToday:   { background:'rgba(99,102,241,.3)',  color:'#c7d2fe' },
-  dayBadgeTomorrow:{ background:'rgba(245,158,11,.2)',  color:'#fcd34d' },
-  dayBadgeNormal:  { background:'rgba(255,255,255,.07)',color:'#94a3b8' },
-  dayDate:     { color:'#cbd5e1', fontSize:15, fontWeight:600 },
+  dayBadgeTomorrow:{ background:'rgba(245,158,11,.2)',  color:'var(--sm-yellow)' },
+  dayBadgeNormal:  { background:'var(--sm-surface-7)',color:'var(--sm-text-sub, #94a3b8)' },
+  dayDate:     { color:'var(--sm-text, #cbd5e1)', fontSize:15, fontWeight:600 },
   dayHoursWrap:{ display:'flex', alignItems:'center', gap:8 },
-  dayHoursLabel:{ color:'#64748b', fontSize:12, whiteSpace:'nowrap' },
-  hoursTrack:  { width:90, height:5, background:'rgba(255,255,255,.07)',
+  dayHoursLabel:{ color:'var(--sm-text-sub)', fontSize:12, whiteSpace:'nowrap' },
+  hoursTrack:  { width:90, height:5, background:'var(--sm-surface-7)',
                  borderRadius:3, overflow:'hidden' },
   hoursFill:   { height:'100%', borderRadius:3, transition:'width .4s ease' },
 
@@ -866,25 +866,25 @@ const S = {
   taskAccent:  { width:3, borderRadius:2, flexShrink:0, alignSelf:'stretch', minHeight:40 },
   taskBody:    { flex:1, minWidth:0 },
   rescheduleBadge:{ background:'rgba(245,158,11,.15)', border:'1px solid rgba(245,158,11,.25)',
-                    borderRadius:8, padding:'1px 8px', color:'#fcd34d',
+                    borderRadius:8, padding:'1px 8px', color:'var(--sm-yellow)',
                     fontSize:11, fontWeight:600, display:'inline-block', marginBottom:4 },
   courseName:  { fontSize:11, fontWeight:700, textTransform:'uppercase',
                  letterSpacing:'.07em', display:'block', marginBottom:4 },
   topicTitle:  { fontSize:15, fontWeight:600, margin:'0 0 6px', lineHeight:1.4 },
   taskMeta:    { display:'flex', flexWrap:'wrap', gap:8, alignItems:'center' },
-  metaChip:    { fontSize:12, color:'#94a3b8', display:'flex', alignItems:'center', gap:4 },
+  metaChip:    { fontSize:12, color:'var(--sm-text-sub, #94a3b8)', display:'flex', alignItems:'center', gap:4 },
   splitBadge:  { background:'rgba(245,158,11,.2)', border:'1px solid rgba(245,158,11,.3)',
-                 borderRadius:10, padding:'1px 6px', color:'#fcd34d',
+                 borderRadius:10, padding:'1px 6px', color:'var(--sm-yellow)',
                  fontSize:11, fontWeight:600, marginLeft:4 },
-  watchLink:   { color:'#818cf8', textDecoration:'none', fontSize:12, fontWeight:600,
+  watchLink:   { color:'var(--sm-indigo)', textDecoration:'none', fontSize:12, fontWeight:600,
                  padding:'2px 8px', background:'rgba(99,102,241,.15)', borderRadius:8 },
 
   // ── Task 4: Difficulty badge styles ────────────────────────────────────────
   diffBadge:   { fontSize:11, fontWeight:700, padding:'2px 8px', borderRadius:10,
                  border:'1px solid', display:'inline-flex', alignItems:'center', gap:3 },
   diffEasy:    { background:'rgba(34,197,94,.12)',  borderColor:'rgba(34,197,94,.3)',  color:'#86efac' },
-  diffMedium:  { background:'rgba(245,158,11,.12)', borderColor:'rgba(245,158,11,.3)', color:'#fcd34d' },
-  diffHard:    { background:'rgba(239,68,68,.12)',  borderColor:'rgba(239,68,68,.3)',  color:'#fca5a5' },
+  diffMedium:  { background:'rgba(245,158,11,.12)', borderColor:'rgba(245,158,11,.3)', color:'var(--sm-yellow)' },
+  diffHard:    { background:'rgba(239,68,68,.12)',  borderColor:'rgba(239,68,68,.3)',  color:'var(--sm-red)' },
 
   // Day difficulty summary row (shown below day header)
   dayDiffRow:  { display:'flex', gap:6, flexWrap:'wrap', marginBottom:12 },
@@ -899,7 +899,7 @@ const S = {
                  borderRadius:8, padding:'5px 10px', color:'#86efac',
                  fontSize:12, fontWeight:600, whiteSpace:'nowrap' },
   btnMissed:   { background:'rgba(239,68,68,.12)', border:'1px solid rgba(239,68,68,.25)',
-                 borderRadius:8, padding:'5px 10px', color:'#fca5a5',
+                 borderRadius:8, padding:'5px 10px', color:'var(--sm-red)',
                  fontSize:12, fontWeight:600, whiteSpace:'nowrap' },
   statusBadge: { borderRadius:10, padding:'5px 12px', fontSize:12, fontWeight:700,
                  flexShrink:0, whiteSpace:'nowrap' },

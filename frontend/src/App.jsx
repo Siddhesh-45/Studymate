@@ -10,6 +10,7 @@ import AllCourses  from './pages/AllCourses';    // ← TASK 4: browse all cours
 import MyCourses   from './pages/MyCourses';     // ← TASK 5: student's selected courses
 import Schedule    from './pages/Schedule';
 import Quiz        from './pages/Quiz';
+import PracticeHub from './pages/PracticeHub';
 import CourseDetail  from './pages/CourseDetail';
 
 // Admin pages
@@ -77,6 +78,11 @@ export default function App() {
         <Route path="/course/:courseId" element={
           <ProtectedRoute>
             <Layout><CourseDetail /></Layout>
+          </ProtectedRoute>
+        }/>
+        <Route path="/quiz" element={
+          <ProtectedRoute>
+            <Layout><PracticeHub /></Layout>
           </ProtectedRoute>
         }/>
         <Route path="/quiz/:courseId/:lessonId" element={

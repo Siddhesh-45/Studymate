@@ -173,7 +173,7 @@ const S = {
     animation: 'spin 0.8s linear infinite',
   },
   loadingText: {
-    color: 'rgba(255,255,255,0.4)',
+    color: 'var(--sm-surface-40)',
     fontSize: '14px',
   },
   toast: {
@@ -186,13 +186,13 @@ const S = {
     fontWeight: '500',
     zIndex: 9999,
     backdropFilter: 'blur(10px)',
-    border: '1px solid rgba(255,255,255,0.1)',
+    border: '1px solid var(--sm-surface-10)',
     animation: 'slideIn 0.3s ease',
   },
   toastColors: {
     success: { background: 'rgba(34,197,94,0.2)',  color: '#86efac', border: '1px solid rgba(34,197,94,0.3)'  },
-    error:   { background: 'rgba(239,68,68,0.2)',   color: '#fca5a5', border: '1px solid rgba(239,68,68,0.3)'   },
-    info:    { background: 'rgba(99,102,241,0.2)',  color: '#a5b4fc', border: '1px solid rgba(99,102,241,0.3)'  },
+    error:   { background: 'rgba(239,68,68,0.2)',   color: 'var(--sm-red)', border: '1px solid rgba(239,68,68,0.3)'   },
+    info:    { background: 'rgba(99,102,241,0.2)',  color: 'var(--sm-indigo-muted)', border: '1px solid rgba(99,102,241,0.3)'  },
   },
   header: {
     display: 'flex',
@@ -205,13 +205,13 @@ const S = {
   title: {
     fontSize: '28px',
     fontWeight: '700',
-    color: '#e2e8f0',
+    color: 'var(--sm-text, #e2e8f0)',
     margin: 0,
     marginBottom: '6px',
     letterSpacing: '-0.5px',
   },
   subtitle: {
-    color: 'rgba(255,255,255,0.45)',
+    color: 'var(--sm-surface-45)',
     fontSize: '14px',
     margin: 0,
     lineHeight: '1.5',
@@ -221,7 +221,7 @@ const S = {
     border: '1px solid rgba(99,102,241,0.3)',
     borderRadius: '20px',
     padding: '6px 16px',
-    color: '#a5b4fc',
+    color: 'var(--sm-indigo-muted)',
     fontSize: '13px',
     fontWeight: '600',
     whiteSpace: 'nowrap',
@@ -229,21 +229,21 @@ const S = {
   emptyBox: {
     textAlign: 'center',
     padding: '80px 24px',
-    background: 'rgba(255,255,255,0.02)',
-    border: '1px dashed rgba(255,255,255,0.1)',
+    background: 'var(--sm-surface-2)',
+    border: '1px dashed var(--sm-surface-10)',
     borderRadius: '20px',
   },
   emptyIcon:    { fontSize: '48px', display: 'block', marginBottom: '16px' },
-  emptyTitle:   { color: '#e2e8f0', fontSize: '20px', fontWeight: '600', margin: '0 0 8px' },
-  emptySubtitle:{ color: 'rgba(255,255,255,0.4)', fontSize: '14px', margin: 0 },
+  emptyTitle:   { color: 'var(--sm-text, #e2e8f0)', fontSize: '20px', fontWeight: '600', margin: '0 0 8px' },
+  emptySubtitle:{ color: 'var(--sm-surface-40)', fontSize: '14px', margin: 0 },
   grid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
     gap: '20px',
   },
   card: {
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.08)',
+    background: 'var(--sm-surface-4)',
+    border: '1px solid var(--sm-surface-8)',
     borderRadius: '16px',
     overflow: 'hidden',
     transition: 'transform 0.2s, border-color 0.2s',
@@ -257,7 +257,7 @@ const S = {
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
-    borderBottom: '1px solid rgba(255,255,255,0.06)',
+    borderBottom: '1px solid var(--sm-surface-6)',
   },
   cardIcon:  { fontSize: '36px' },
   addedBadge: {
@@ -281,13 +281,13 @@ const S = {
   courseTitle: {
     fontSize: '16px',
     fontWeight: '700',
-    color: '#e2e8f0',
+    color: 'var(--sm-text, #e2e8f0)',
     margin: '0 0 8px',
     lineHeight: '1.4',
   },
   courseDesc: {
     fontSize: '13px',
-    color: 'rgba(255,255,255,0.45)',
+    color: 'var(--sm-surface-45)',
     margin: '0 0 12px',
     lineHeight: '1.5',
     display: '-webkit-box',
@@ -304,11 +304,11 @@ const S = {
     paddingTop: '12px',
   },
   metaTag: {
-    background: 'rgba(255,255,255,0.06)',
-    border: '1px solid rgba(255,255,255,0.08)',
+    background: 'var(--sm-surface-6)',
+    border: '1px solid var(--sm-surface-8)',
     borderRadius: '20px',
     padding: '3px 10px',
-    color: 'rgba(255,255,255,0.5)',
+    color: 'var(--sm-surface-50)',
     fontSize: '12px',
   },
   addBtn: {
@@ -334,7 +334,7 @@ const S = {
   },
   addBtnLoading: {
     background: 'rgba(99,102,241,0.2)',
-    color: '#a5b4fc',
+    color: 'var(--sm-indigo-muted)',
     cursor: 'not-allowed',
   },
 };

@@ -19,6 +19,8 @@ const studentCoursesRoutes = require('./routes/studentCourses'); // GET+POST /ap
 const userChaptersRoutes   = require('./routes/userChapters');
 const quizRoutes           = require('./routes/quiz');         // GET /api/quiz/generate/:courseId/:lessonId
 const availabilityRoutes   = require('./routes/availability'); // GET|POST /api/availability
+const progressRoutes       = require('./routes/progressRoutes');
+const quotesRoutes         = require('./routes/quotes');
 
 // ─── Mount Routes ─────────────────────────────────────────────────────────────
 app.use('/api/auth',            authRoutes);
@@ -30,6 +32,8 @@ app.use('/api/admin',           adminRoutes);
 app.use('/api',                 userChaptersRoutes);
 app.use('/api/quiz',            quizRoutes);          // quiz generation via Gemini
 app.use('/api/availability',    availabilityRoutes);  // weekly study hours
+app.use('/api/progress',        progressRoutes);
+app.use('/api/quotes',          quotesRoutes);
 
 app.get('/', (req, res) => {
   res.send('StudyMate API is running...');

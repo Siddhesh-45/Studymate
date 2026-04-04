@@ -163,6 +163,21 @@ export default function Quiz() {
       await API.patch(`/student-courses/${entry._id}/complete-lesson`, {
         videoId: lessonId,
       });
+
+      // Update in the Dynamic Schedule so "Today's Task" dashboard updates!
+      try {
+        await API.post('/schedule/complete-topic', { topicId: lessonId });
+      } catch (e) {
+        console.log('Skipped marking in schedule, might not be generated yet', e.message);
+      }
+
+      // Update the Progress log so streaks and total topics completed increase!
+      try {
+        await API.post('/progress/complete', { courseId, topic: lessonTitle });
+      } catch (e) {
+        console.log('Skipped progress logging', e.message);
+      }
+
       setPhase('done');
     } catch (err) {
       console.error(err);
@@ -227,7 +242,7 @@ export default function Quiz() {
       <div style={S.fullPage}>
         <motion.div style={S.errorCard} {...fadeUp}>
           <div style={S.errorIcon}>⚠️</div>
-          <h2 style={{ ...S.heading, color: '#fca5a5' }}>Something went wrong</h2>
+          <h2 style={{ ...S.heading, color: 'var(--sm-red)' }}>Something went wrong</h2>
           <p style={S.errorMsg}>{error}</p>
           <div style={S.errorActions}>
             <button style={S.primaryBtn} onClick={fetchQuiz}>🔄 Try Again</button>
@@ -303,12 +318,12 @@ export default function Quiz() {
           >
             <span style={{
               fontSize: '42px', fontWeight: '900',
-              color: passed ? '#4ade80' : '#f87171',
+              color: passed ? '#4ade80' : 'var(--sm-red-muted)',
               fontFamily: "'Segoe UI', system-ui, sans-serif",
             }}>
               {pct}%
             </span>
-            <span style={{ fontSize: '14px', color: '#94a3b8', marginTop: '4px' }}>
+            <span style={{ fontSize: '14px', color: 'var(--sm-text-sub, #94a3b8)', marginTop: '4px' }}>
               {score} of {total} correct
             </span>
           </motion.div>
@@ -317,15 +332,15 @@ export default function Quiz() {
           <div style={S.statsRow}>
             <div style={{ ...S.statBox, borderColor: 'rgba(34,197,94,0.2)' }}>
               <span style={{ fontSize: '24px', fontWeight: '800', color: '#4ade80' }}>{score}</span>
-              <span style={{ fontSize: '12px', color: '#64748b' }}>Correct</span>
+              <span style={{ fontSize: '12px', color: 'var(--sm-text-sub)' }}>Correct</span>
             </div>
             <div style={{ ...S.statBox, borderColor: 'rgba(239,68,68,0.2)' }}>
-              <span style={{ fontSize: '24px', fontWeight: '800', color: '#f87171' }}>{total - score}</span>
-              <span style={{ fontSize: '12px', color: '#64748b' }}>Wrong</span>
+              <span style={{ fontSize: '24px', fontWeight: '800', color: 'var(--sm-red-muted)' }}>{total - score}</span>
+              <span style={{ fontSize: '12px', color: 'var(--sm-text-sub)' }}>Wrong</span>
             </div>
             <div style={{ ...S.statBox, borderColor: 'rgba(99,102,241,0.2)' }}>
-              <span style={{ fontSize: '24px', fontWeight: '800', color: '#818cf8' }}>{total}</span>
-              <span style={{ fontSize: '12px', color: '#64748b' }}>Total</span>
+              <span style={{ fontSize: '24px', fontWeight: '800', color: 'var(--sm-indigo)' }}>{total}</span>
+              <span style={{ fontSize: '12px', color: 'var(--sm-text-sub)' }}>Total</span>
             </div>
           </div>
 
@@ -336,7 +351,7 @@ export default function Quiz() {
                 key={i}
                 style={{
                   ...S.reviewItem,
-                  borderLeftColor: a.isRight ? '#4ade80' : '#f87171',
+                  borderLeftColor: a.isRight ? '#4ade80' : 'var(--sm-red-muted)',
                   background: a.isRight ? 'rgba(34,197,94,0.04)' : 'rgba(239,68,68,0.04)',
                 }}
                 initial={{ opacity: 0, x: -20 }}
@@ -347,17 +362,17 @@ export default function Quiz() {
                   <span style={{
                     ...S.reviewBadge,
                     background: a.isRight ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)',
-                    color: a.isRight ? '#4ade80' : '#f87171',
+                    color: a.isRight ? '#4ade80' : 'var(--sm-red-muted)',
                   }}>
                     {a.isRight ? '✓' : '✗'}
                   </span>
-                  <span style={{ fontSize: '12px', color: '#64748b' }}>Q{i + 1}</span>
+                  <span style={{ fontSize: '12px', color: 'var(--sm-text-sub)' }}>Q{i + 1}</span>
                 </div>
                 <div style={{ flex: 1 }}>
                   <p style={S.reviewQuestion}>{a.question}</p>
                   <p style={{
                     fontSize: '13px', marginTop: '4px',
-                    color: a.isRight ? '#86efac' : '#fca5a5',
+                    color: a.isRight ? '#86efac' : 'var(--sm-red)',
                   }}>
                     Your answer: {a.chosen}
                   </p>
@@ -371,7 +386,7 @@ export default function Quiz() {
             ))}
           </div>
 
-          {markError && <p style={{ color: '#fca5a5', fontSize: '14px', marginTop: '12px' }}>{markError}</p>}
+          {markError && <p style={{ color: 'var(--sm-red)', fontSize: '14px', marginTop: '12px' }}>{markError}</p>}
 
           {/* Action Buttons */}
           <div style={S.resultActions}>
@@ -404,7 +419,7 @@ export default function Quiz() {
     return (
       <div style={S.fullPage}>
         <motion.div style={S.errorCard} {...fadeUp}>
-          <p style={{ color: '#94a3b8', fontSize: '16px' }}>No questions available</p>
+          <p style={{ color: 'var(--sm-text-sub, #94a3b8)', fontSize: '16px' }}>No questions available</p>
           <button style={S.primaryBtn} onClick={fetchQuiz}>🔄 Retry</button>
         </motion.div>
       </div>
@@ -446,16 +461,16 @@ export default function Quiz() {
           </div>
           <div style={S.navLegend}>
             <div style={S.legendItem}>
-              <span style={{ ...S.legendDot, background: 'rgba(99,102,241,0.25)', border: '2px solid #818cf8' }} />
-              <span style={{ fontSize: '11px', color: '#64748b' }}>Current</span>
+              <span style={{ ...S.legendDot, background: 'rgba(99,102,241,0.25)', border: '2px solid var(--sm-indigo)' }} />
+              <span style={{ fontSize: '11px', color: 'var(--sm-text-sub)' }}>Current</span>
             </div>
             <div style={S.legendItem}>
               <span style={{ ...S.legendDot, background: 'rgba(34,197,94,0.2)', border: '2px solid #4ade80' }} />
-              <span style={{ fontSize: '11px', color: '#64748b' }}>Answered</span>
+              <span style={{ fontSize: '11px', color: 'var(--sm-text-sub)' }}>Answered</span>
             </div>
             <div style={S.legendItem}>
-              <span style={{ ...S.legendDot, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }} />
-              <span style={{ fontSize: '11px', color: '#64748b' }}>Pending</span>
+              <span style={{ ...S.legendDot, background: 'var(--sm-surface-6)', border: '1px solid var(--sm-surface-10)' }} />
+              <span style={{ fontSize: '11px', color: 'var(--sm-text-sub)' }}>Pending</span>
             </div>
           </div>
         </motion.div>
@@ -505,7 +520,7 @@ export default function Quiz() {
             <motion.span
               style={{
                 ...S.timerText,
-                color: timer > 10 ? '#a5b4fc' : timer > 5 ? '#fbbf24' : '#f87171',
+                color: timer > 10 ? 'var(--sm-indigo-muted)' : timer > 5 ? '#fbbf24' : 'var(--sm-red-muted)',
               }}
               animate={timer <= 5 ? { scale: [1, 1.15, 1] } : {}}
               transition={{ duration: 0.5, repeat: timer <= 5 ? Infinity : 0 }}
@@ -541,7 +556,7 @@ export default function Quiz() {
                         ...S.optionBtn,
                         ...(isChosen ? S.optionChosen : {}),
                       }}
-                      whileHover={{ scale: 1.01, backgroundColor: isChosen ? 'rgba(99,102,241,0.18)' : 'rgba(255,255,255,0.07)' }}
+                      whileHover={{ scale: 1.01, backgroundColor: isChosen ? 'rgba(99,102,241,0.18)' : 'var(--sm-surface-7)' }}
                       whileTap={{ scale: 0.98 }}
                       transition={{ duration: 0.15 }}
                     >
@@ -587,8 +602,6 @@ export default function Quiz() {
 // ─────────────────────────────────────────────────────────────────────────────
 const S = {
   fullPage: {
-    minHeight: '100vh',
-    background: 'linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 35%, #16213e 65%, #0f0f1a 100%)',
     padding: '24px 16px 60px',
     fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif",
     display: 'flex',
@@ -627,12 +640,12 @@ const S = {
   loadingTitle: {
     fontSize: '24px',
     fontWeight: '700',
-    color: '#f1f5f9',
+    color: 'var(--sm-text, #f1f5f9)',
     margin: 0,
   },
   loadingHint: {
     fontSize: '14px',
-    color: '#64748b',
+    color: 'var(--sm-text-sub)',
     margin: 0,
   },
   loadingDots: {
@@ -657,16 +670,16 @@ const S = {
     minHeight: '50vh',
     gap: '16px',
     textAlign: 'center',
-    background: 'rgba(255,255,255,0.03)',
+    background: 'var(--sm-surface-3)',
     backdropFilter: 'blur(20px)',
-    border: '1px solid rgba(255,255,255,0.07)',
+    border: '1px solid var(--sm-surface-7)',
     borderRadius: '24px',
     padding: '48px 40px',
     maxWidth: '520px',
     width: '100%',
   },
   errorIcon: { fontSize: '56px' },
-  errorMsg: { color: '#94a3b8', fontSize: '15px', maxWidth: '380px', lineHeight: '1.6' },
+  errorMsg: { color: 'var(--sm-text-sub, #94a3b8)', fontSize: '15px', maxWidth: '380px', lineHeight: '1.6' },
   errorActions: { display: 'flex', gap: '12px', marginTop: '12px', flexWrap: 'wrap', justifyContent: 'center' },
 
   // ── Done ─────────────────────────────────────────────────────────────────
@@ -678,7 +691,7 @@ const S = {
     minHeight: '50vh',
     gap: '16px',
     textAlign: 'center',
-    background: 'rgba(255,255,255,0.03)',
+    background: 'var(--sm-surface-3)',
     backdropFilter: 'blur(20px)',
     border: '1px solid rgba(34,197,94,0.15)',
     borderRadius: '24px',
@@ -687,14 +700,14 @@ const S = {
     width: '100%',
   },
   doneEmoji: { fontSize: '72px' },
-  doneHint: { color: '#94a3b8', fontSize: '15px' },
+  doneHint: { color: 'var(--sm-text-sub, #94a3b8)', fontSize: '15px' },
   doneActions: { display: 'flex', gap: '12px', marginTop: '20px', flexWrap: 'wrap', justifyContent: 'center' },
 
   // ── Heading ──────────────────────────────────────────────────────────────
   heading: {
     fontSize: '28px',
     fontWeight: '800',
-    color: '#f1f5f9',
+    color: 'var(--sm-text, #f1f5f9)',
     margin: 0,
     letterSpacing: '-0.02em',
   },
@@ -712,9 +725,9 @@ const S = {
   navPanel: {
     width: '200px',
     flexShrink: 0,
-    background: 'rgba(255,255,255,0.03)',
+    background: 'var(--sm-surface-3)',
     backdropFilter: 'blur(20px)',
-    border: '1px solid rgba(255,255,255,0.07)',
+    border: '1px solid var(--sm-surface-7)',
     borderRadius: '20px',
     padding: '24px 20px',
     position: 'sticky',
@@ -723,7 +736,7 @@ const S = {
   navTitle: {
     fontSize: '14px',
     fontWeight: '700',
-    color: '#94a3b8',
+    color: 'var(--sm-text-sub, #94a3b8)',
     margin: '0 0 16px',
     textTransform: 'uppercase',
     letterSpacing: '0.08em',
@@ -742,15 +755,15 @@ const S = {
     justifyContent: 'center',
     fontSize: '12px',
     fontWeight: '700',
-    color: '#64748b',
-    background: 'rgba(255,255,255,0.06)',
-    border: '1px solid rgba(255,255,255,0.1)',
+    color: 'var(--sm-text-sub)',
+    background: 'var(--sm-surface-6)',
+    border: '1px solid var(--sm-surface-10)',
     cursor: 'default',
     transition: 'all 0.2s',
   },
   navDotCurrent: {
     background: 'rgba(99,102,241,0.25)',
-    border: '2px solid #818cf8',
+    border: '2px solid var(--sm-indigo)',
     color: '#c7d2fe',
     boxShadow: '0 0 12px rgba(99,102,241,0.3)',
   },
@@ -765,7 +778,7 @@ const S = {
     gap: '8px',
     marginTop: '20px',
     paddingTop: '16px',
-    borderTop: '1px solid rgba(255,255,255,0.06)',
+    borderTop: '1px solid var(--sm-surface-6)',
   },
   legendItem: {
     display: 'flex',
@@ -797,7 +810,7 @@ const S = {
   backLink: {
     background: 'none',
     border: 'none',
-    color: '#818cf8',
+    color: 'var(--sm-indigo)',
     cursor: 'pointer',
     fontSize: '14px',
     fontWeight: '600',
@@ -810,7 +823,7 @@ const S = {
     textAlign: 'center',
     fontSize: '13px',
     fontWeight: '600',
-    color: '#94a3b8',
+    color: 'var(--sm-text-sub, #94a3b8)',
     padding: '0 12px',
     display: 'flex',
     alignItems: 'center',
@@ -821,7 +834,7 @@ const S = {
     border: '1px solid rgba(99,102,241,0.25)',
     borderRadius: '20px',
     padding: '6px 16px',
-    color: '#a5b4fc',
+    color: 'var(--sm-indigo-muted)',
     fontSize: '13px',
     fontWeight: '700',
     whiteSpace: 'nowrap',
@@ -830,7 +843,7 @@ const S = {
   // ── Progress Bar ─────────────────────────────────────────────────────────
   progressTrack: {
     height: '4px',
-    background: 'rgba(255,255,255,0.06)',
+    background: 'var(--sm-surface-6)',
     borderRadius: '2px',
     marginBottom: '16px',
     overflow: 'hidden',
@@ -851,7 +864,7 @@ const S = {
   timerBarTrack: {
     flex: 1,
     height: '6px',
-    background: 'rgba(255,255,255,0.06)',
+    background: 'var(--sm-surface-6)',
     borderRadius: '3px',
     overflow: 'hidden',
   },
@@ -870,18 +883,18 @@ const S = {
 
   // ── Question Card ────────────────────────────────────────────────────────
   questionCard: {
-    background: 'rgba(255,255,255,0.04)',
+    background: 'var(--sm-surface-4)',
     backdropFilter: 'blur(20px)',
-    border: '1px solid rgba(255,255,255,0.08)',
+    border: '1px solid var(--sm-surface-8)',
     borderRadius: '24px',
     padding: '40px 36px',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05) inset',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px var(--sm-surface-5) inset',
   },
   questionTag: {
     display: 'inline-block',
     fontSize: '11px',
     fontWeight: '800',
-    color: '#818cf8',
+    color: 'var(--sm-indigo)',
     textTransform: 'uppercase',
     letterSpacing: '0.12em',
     background: 'rgba(99,102,241,0.1)',
@@ -892,7 +905,7 @@ const S = {
   questionText: {
     fontSize: '20px',
     fontWeight: '700',
-    color: '#f1f5f9',
+    color: 'var(--sm-text, #f1f5f9)',
     margin: '0 0 28px',
     lineHeight: '1.5',
     letterSpacing: '-0.01em',
@@ -908,11 +921,11 @@ const S = {
     display: 'flex',
     alignItems: 'center',
     gap: '14px',
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.1)',
+    background: 'var(--sm-surface-4)',
+    border: '1px solid var(--sm-surface-10)',
     borderRadius: '14px',
     padding: '16px 20px',
-    color: '#e2e8f0',
+    color: 'var(--sm-text, #e2e8f0)',
     fontSize: '15px',
     cursor: 'pointer',
     textAlign: 'left',
@@ -924,20 +937,20 @@ const S = {
   optionChosen: {
     background: 'rgba(99,102,241,0.14)',
     borderColor: '#6366f1',
-    color: '#f1f5f9',
+    color: 'var(--sm-text, #f1f5f9)',
     boxShadow: '0 0 16px rgba(99,102,241,0.15)',
   },
   optionLetter: {
     width: '36px',
     height: '36px',
     borderRadius: '10px',
-    background: 'rgba(255,255,255,0.06)',
+    background: 'var(--sm-surface-6)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     fontSize: '14px',
     fontWeight: '800',
-    color: '#64748b',
+    color: 'var(--sm-text-sub)',
     flexShrink: 0,
     transition: 'all 0.2s',
   },
@@ -965,11 +978,11 @@ const S = {
     boxShadow: '0 4px 16px rgba(99,102,241,0.3)',
   },
   ghostBtn: {
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.12)',
+    background: 'var(--sm-surface-5)',
+    border: '1px solid var(--sm-surface-12)',
     borderRadius: '14px',
     padding: '14px 24px',
-    color: '#e2e8f0',
+    color: 'var(--sm-text, #e2e8f0)',
     fontSize: '15px',
     fontWeight: '600',
     cursor: 'pointer',
@@ -985,9 +998,9 @@ const S = {
   resultContainer: {
     maxWidth: '720px',
     width: '100%',
-    background: 'rgba(255,255,255,0.03)',
+    background: 'var(--sm-surface-3)',
     backdropFilter: 'blur(20px)',
-    border: '1px solid rgba(255,255,255,0.07)',
+    border: '1px solid var(--sm-surface-7)',
     borderRadius: '28px',
     padding: '48px 40px',
     textAlign: 'center',
@@ -1026,7 +1039,7 @@ const S = {
     padding: '16px 24px',
     borderRadius: '14px',
     border: '1px solid',
-    background: 'rgba(255,255,255,0.03)',
+    background: 'var(--sm-surface-3)',
     minWidth: '80px',
   },
   reviewScroll: {
@@ -1045,7 +1058,7 @@ const S = {
     padding: '14px 16px',
     borderRadius: '12px',
     borderLeft: '3px solid',
-    background: 'rgba(255,255,255,0.02)',
+    background: 'var(--sm-surface-2)',
   },
   reviewNum: {
     display: 'flex',
@@ -1067,7 +1080,7 @@ const S = {
   reviewQuestion: {
     fontSize: '14px',
     fontWeight: '600',
-    color: '#e2e8f0',
+    color: 'var(--sm-text, #e2e8f0)',
     margin: 0,
     lineHeight: '1.4',
   },
@@ -1096,7 +1109,7 @@ if (typeof document !== 'undefined' && !document.getElementById('quiz-keyframes'
       background: transparent;
     }
     .quiz-review-scroll::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.1);
+      background: var(--sm-surface-10);
       border-radius: 3px;
     }
     /* Responsive overrides */

@@ -10,7 +10,7 @@ function Toast({ toasts, removeToast }) {
           background:   t.type === 'success' ? 'rgba(34,197,94,0.18)' : t.type === 'warn' ? 'rgba(245,158,11,0.18)' : 'rgba(239,68,68,0.18)',
           borderColor:  t.type === 'success' ? 'rgba(34,197,94,0.4)'  : t.type === 'warn' ? 'rgba(245,158,11,0.4)'  : 'rgba(239,68,68,0.4)',
         }}>
-          <span style={{ flex: 1, fontSize: '13px', color: '#e2e8f0' }}>{t.message}</span>
+          <span style={{ flex: 1, fontSize: '13px', color: 'var(--sm-text, #e2e8f0)' }}>{t.message}</span>
           <button onClick={() => removeToast(t.id)} style={S.toastClose}>×</button>
         </div>
       ))}
@@ -269,24 +269,24 @@ export default function AdminContent() {
 
 const S = {
   page:         { maxWidth: '1000px', margin: '0 auto', fontFamily: 'Segoe UI, sans-serif' },
-  title:        { fontSize: '24px', fontWeight: 'bold', color: '#f1f5f9', marginBottom: '24px' },
-  tabs:         { display: 'flex', gap: '10px', marginBottom: '24px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '12px' },
-  tab:          { background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '15px', fontWeight: '600', padding: '8px 16px', cursor: 'pointer', borderRadius: '8px' },
-  activeTab:    { background: 'rgba(99,102,241,0.15)', color: '#818cf8' },
+  title:        { fontSize: '24px', fontWeight: 'bold', color: 'var(--sm-text, #f1f5f9)', marginBottom: '24px' },
+  tabs:         { display: 'flex', gap: '10px', marginBottom: '24px', borderBottom: '1px solid var(--sm-surface-10)', paddingBottom: '12px' },
+  tab:          { background: 'transparent', border: 'none', color: 'var(--sm-text-sub, #94a3b8)', fontSize: '15px', fontWeight: '600', padding: '8px 16px', cursor: 'pointer', borderRadius: '8px' },
+  activeTab:    { background: 'rgba(99,102,241,0.15)', color: 'var(--sm-indigo)' },
   content:      { display: 'flex', flexDirection: 'column', gap: '20px' },
   layout:       { display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'flex-start' },
-  formCard:     { background: 'rgba(255,255,255,0.04)', borderRadius: '12px', padding: '20px', width: '300px', flexShrink: 0 },
-  listCard:     { flex: 1, minWidth: '400px', background: 'rgba(255,255,255,0.04)', borderRadius: '12px', padding: '20px' },
-  cardTitle:    { margin: '0 0 16px 0', fontSize: '16px', color: '#e2e8f0' },
+  formCard:     { background: 'var(--sm-surface-4)', borderRadius: '12px', padding: '20px', width: '300px', flexShrink: 0 },
+  listCard:     { flex: 1, minWidth: '400px', background: 'var(--sm-surface-4)', borderRadius: '12px', padding: '20px' },
+  cardTitle:    { margin: '0 0 16px 0', fontSize: '16px', color: 'var(--sm-text, #e2e8f0)' },
   form:         { display: 'flex', flexDirection: 'column', gap: '12px' },
-  input:        { width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.2)', color: '#fff', fontSize: '14px', boxSizing: 'border-box' },
+  input:        { width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--sm-surface-10)', background: 'rgba(0,0,0,0.2)', color: '#fff', fontSize: '14px', boxSizing: 'border-box' },
   btnPrimary:   { background: '#6366f1', color: '#fff', padding: '10px', borderRadius: '8px', border: 'none', fontWeight: '600', cursor: 'pointer' },
   btnDanger:    { background: 'rgba(239,68,68,0.1)', color: '#ef4444', padding: '6px 12px', borderRadius: '6px', border: '1px solid rgba(239,68,68,0.2)', fontSize: '12px', cursor: 'pointer' },
   list:         { display: 'flex', flexDirection: 'column', gap: '8px' },
-  listItem:     { display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' },
-  badge:        { background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: '10px', fontSize: '11px', textTransform: 'uppercase' },
-  muted:        { color: 'rgba(255,255,255,0.4)', fontSize: '13px' },
+  listItem:     { display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--sm-surface-5)' },
+  badge:        { background: 'var(--sm-surface-10)', padding: '2px 8px', borderRadius: '10px', fontSize: '11px', textTransform: 'uppercase' },
+  muted:        { color: 'var(--sm-surface-40)', fontSize: '13px' },
   toastContainer:{ position: 'fixed', top: '20px', right: '20px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '300px' },
   toast:         { display: 'flex', alignItems: 'center', gap: '10px', backdropFilter: 'blur(12px)', border: '1px solid', borderRadius: '8px', padding: '12px 16px', animation: 'slideIn 0.25s ease' },
-  toastClose:    { background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '16px' },
+  toastClose:    { background: 'none', border: 'none', color: 'var(--sm-surface-50)', cursor: 'pointer', fontSize: '16px' },
 };

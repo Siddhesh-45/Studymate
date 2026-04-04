@@ -37,6 +37,18 @@ const scheduledTaskSchema = new mongoose.Schema({
     default: 'pending',
   },
   rescheduledFrom: { type: Date, default: null },  // set when task was moved
+
+  // ── Task 8: Adaptive difficulty — performance tracking ────────────────────
+  // Tracks how many times the student answered correctly vs wrongly on this
+  // topic (via quizzes or self-assessment). Used to identify weak topics.
+  performance: {
+    correct: { type: Number, default: 0 },
+    wrong:   { type: Number, default: 0 },
+  },
+
+  // Date the student last reviewed this topic (used for spaced-repetition gap)
+  lastReviewed: { type: Date, default: null },
+
 }, { _id: true });
 
 const scheduledDaySchema = new mongoose.Schema({

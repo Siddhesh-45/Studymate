@@ -1,0 +1,104 @@
+const mongoose = require('mongoose');
+require('dotenv').config();
+const Quote = require('./models/Quote');
+
+/* 
+Categories:
+- Motivation (Morning 5am–12pm)
+- Discipline (Afternoon 12pm–5pm)
+- Funny (Evening 5pm–10pm)
+- Savage (Night 10pm–5am)
+*/
+
+const quotes = [
+  // ── MOTIVATION ────────────────────────────────────────────────────────────
+  { category: 'Motivation', text: 'Aaj ka pain, kal ka gain.' },
+  { category: 'Motivation', text: 'Tu consistent raha toh success pakki hai.' },
+  { category: 'Motivation', text: 'Ek din ya day one — choose kar.' },
+  { category: 'Motivation', text: 'Sapne bade hain, toh mehnat bhi badi karni padegi.' },
+  { category: 'Motivation', text: 'Topper banne ka plan hai ya bas soch raha hai?' },
+  { category: 'Motivation', text: 'Mehnat itni shanti se karo ki safalta shor macha de.' },
+  { category: 'Motivation', text: 'Thoda aur padh le bhai, manzil paas hi hai.' },
+  { category: 'Motivation', text: 'Hard work beats talent when talent doesn’t work hard.' },
+  { category: 'Motivation', text: 'Kismat se zyada apni mehnat par bharosa rakh.' },
+  { category: 'Motivation', text: 'Khud par vishwas rakh, tu kar sakta hai!' },
+  { category: 'Motivation', text: 'Har chota badlav ek badi kamyabi ka hissa hota hai.' },
+  { category: 'Motivation', text: 'Jab tak todenge nahi, tab tak chodenge nahi!' },
+  { category: 'Motivation', text: 'Duniya ki fikar mat kar, apne lakshya par dhyan de.' },
+  { category: 'Motivation', text: 'Subah uthte hi apna maqsad yaad kar, phir dekh din kaisa jata hai.' },
+  { category: 'Motivation', text: 'Abhi jo mehnat karega, wahi kal aish karega.' },
+
+  // ── DISCIPLINE ────────────────────────────────────────────────────────────
+  { category: 'Discipline', text: 'Discipline boring hota hai, par result sexy hota hai.' },
+  { category: 'Discipline', text: 'Phone side me rakh aur zindagi set kar.' },
+  { category: 'Discipline', text: 'Kal se nahi, aaj se start kar.' },
+  { category: 'Discipline', text: 'Focus level: Arjun ki nazar fish ki aankh par.' },
+  { category: 'Discipline', text: 'Motivation starts you off, Discipline keeps you going.' },
+  { category: 'Discipline', text: 'Time pass karna band kar, future tere decisions ka wait kar raha hai.' },
+  { category: 'Discipline', text: 'Roz ka thoda-thoda effort, ek din bada result dega.' },
+  { category: 'Discipline', text: 'Aaj nahi padha toh kal regret karega.' },
+  { category: 'Discipline', text: 'Excuses don\'t get results. Action does.' },
+  { category: 'Discipline', text: 'Apne din ko plan kar, varna din tujhe plan kar lega.' },
+  { category: 'Discipline', text: 'Consistency is the key to mastering anything.' },
+  { category: 'Discipline', text: 'Success is just discipline practiced every day.' },
+  { category: 'Discipline', text: 'Agar kuch alag karna hai, toh alag aadat dalni padegi.' },
+  { category: 'Discipline', text: 'Choti choti aadatain bada asar dikhati hain.' },
+  { category: 'Discipline', text: 'Dhyan bhatkane wali cheezon se door raho!' },
+
+  // ── FUNNY ────────────────────────────────────────────────────────────
+  { category: 'Funny', text: 'Tu padhega nahi toh Google bhi help nahi karega.' },
+  { category: 'Funny', text: 'Padhai kar le, varna Insta walo ki shaadi dekhta reh jayega.' },
+  { category: 'Funny', text: 'Books utha le bhai, reels se ghar nahi chalta.' },
+  { category: 'Funny', text: 'Tere dost aage nikal jayenge, tu yahi memes bhejta reh jayega.' },
+  { category: 'Funny', text: 'Bhai tu padhne baith, baaki dukh baad me discuss karenge.' },
+  { category: 'Funny', text: 'Jab result aayega, tab relatives nahi AI answer dega kya?' },
+  { category: 'Funny', text: 'Degree chahiye ya reels ka diamond play button?' },
+  { category: 'Funny', text: 'Maa baap ki expectations tere net pack se jyada badi hain.' },
+  { category: 'Funny', text: 'Agar padhai nahi ki toh shadi bhi arrange wale karwa denge. Choice is yours.' },
+  { category: 'Funny', text: 'Padh le bhai, crush bhi topper pe line marti hai.' },
+  { category: 'Funny', text: 'Wifi band kar, dimag chalu kar.' },
+  { category: 'Funny', text: 'Bohot reels dekh li, ab thodi padhai bhi dekh le meri jaan.' },
+  { category: 'Funny', text: 'Aadha syllabus baaki hai aur tu web series ke chakkar me hai?' },
+  { category: 'Funny', text: 'Padhai kabhi dhoka nahi deti, sirf GPA kam aata hai.' },
+  { category: 'Funny', text: 'Tujhe dekh kar Netflix bhi poonch raha hai: "Are you still watching?"' },
+
+  // ── SAVAGE ────────────────────────────────────────────────────────────
+  { category: 'Savage', text: 'Padh le bhai, warna future tujhe ignore karega.' },
+  { category: 'Savage', text: 'Sochne se crorepathi nahi bante, kaam karna padta hai.' },
+  { category: 'Savage', text: 'Dost ki placement dekh kar rona hai ya khud placement leni hai?' },
+  { category: 'Savage', text: 'Garibi sabse bada motivation hai, tujhe aur kya chahiye?' },
+  { category: 'Savage', text: 'Tera screen time tere marks se zyada hai. Sharam kar.' },
+  { category: 'Savage', text: 'Duniya tere aasuon pe hasegi, success par taliyan bajayegi. Decide today.' },
+  { category: 'Savage', text: 'Success chahiye toh neend ko compromise karna seekh.' },
+  { category: 'Savage', text: 'Raat bhar jaag kar chating karega toh career bhi chatting me nikal jayega.' },
+  { category: 'Savage', text: 'Agar aaj neend pyaari hai, toh kal reality bhayankar hogi.' },
+  { category: 'Savage', text: 'Competition bahut tight hai, aur tu light le raha hai.' },
+  { category: 'Savage', text: 'Jo aisi raato me sote hain, wo aam zindagi rote hain.' },
+  { category: 'Savage', text: 'Middle class log sote nahi, sapne poore karte hain.' },
+  { category: 'Savage', text: 'Kal kare so aaj kar, aaj kare so ab. Warna degree latak jayegi tab!' },
+  { category: 'Savage', text: 'Agar aaj sacrifice nahi karega, toh kal reality tujhe sacrifice kar degi.' },
+  { category: 'Savage', text: 'Aise hi chalta raha toh placement wale din paani serve karega.' },
+];
+
+async function seedQuotes() {
+  try {
+    const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/studymate';
+    await mongoose.connect(mongoUri);
+    console.log('MongoDB connected for Quote seeding...');
+
+    // Clear existing
+    await Quote.deleteMany({});
+    console.log('Cleared existing quotes.');
+
+    // Insert new
+    await Quote.insertMany(quotes);
+    console.log(`Successfully seeded ${quotes.length} quotes!`);
+    
+    process.exit(0);
+  } catch (error) {
+    console.error('Error seeding quotes:', error);
+    process.exit(1);
+  }
+}
+
+seedQuotes();

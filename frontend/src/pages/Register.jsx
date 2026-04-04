@@ -143,7 +143,7 @@ export default function Register() {
                       key={i}
                       style={{
                         ...styles.strengthSegment,
-                        background: strength >= i ? strengthColor[strength] : 'rgba(255,255,255,0.1)',
+                        background: strength >= i ? strengthColor[strength] : 'var(--sm-surface-10)',
                       }}
                     />
                   ))}
@@ -167,7 +167,7 @@ export default function Register() {
                 ...styles.input,
                 borderColor: confirm && confirm !== password
                   ? 'rgba(239,68,68,0.6)'
-                  : 'rgba(255,255,255,0.15)',
+                  : 'var(--sm-surface-15)',
               }}
               autoComplete="new-password"
             />
@@ -232,9 +232,9 @@ const styles = {
     pointerEvents: 'none',
   },
   card: {
-    background: 'rgba(255,255,255,0.05)',
+    background: 'var(--sm-surface-5)',
     backdropFilter: 'blur(20px)',
-    border: '1px solid rgba(255,255,255,0.12)',
+    border: '1px solid var(--sm-surface-12)',
     borderRadius: '24px',
     padding: '40px',
     width: '100%',
@@ -259,7 +259,7 @@ const styles = {
     letterSpacing: '-0.5px',
   },
   subtitle: {
-    color: 'rgba(255,255,255,0.5)',
+    color: 'var(--sm-surface-50)',
     fontSize: '14px',
     margin: 0,
   },
@@ -273,7 +273,7 @@ const styles = {
     border: '1px solid rgba(16, 185, 129, 0.4)',
     borderRadius: '10px',
     padding: '12px 16px',
-    color: '#6ee7b7',
+    color: 'var(--sm-emerald)',
     fontSize: '14px',
   },
   errorBox: {
@@ -281,7 +281,7 @@ const styles = {
     border: '1px solid rgba(239, 68, 68, 0.4)',
     borderRadius: '10px',
     padding: '12px 16px',
-    color: '#fca5a5',
+    color: 'var(--sm-red)',
     fontSize: '14px',
   },
   field: {
@@ -290,13 +290,13 @@ const styles = {
     gap: '6px',
   },
   label: {
-    color: 'rgba(255,255,255,0.7)',
+    color: 'var(--sm-surface-70)',
     fontSize: '13px',
     fontWeight: '500',
   },
   input: {
-    background: 'rgba(255,255,255,0.08)',
-    border: '1px solid rgba(255,255,255,0.15)',
+    background: 'var(--sm-surface-8)',
+    border: '1px solid var(--sm-surface-15)',
     borderRadius: '10px',
     padding: '11px 14px',
     color: '#fff',
@@ -339,11 +339,11 @@ const styles = {
     boxShadow: `0 4px 20px ${ACCENT}55`,
   },
   btnDisabled: {
-    background: 'rgba(255,255,255,0.15)',
+    background: 'var(--sm-surface-15)',
     border: 'none',
     borderRadius: '12px',
     padding: '13px',
-    color: 'rgba(255,255,255,0.5)',
+    color: 'var(--sm-surface-50)',
     fontSize: '15px',
     fontWeight: '600',
     cursor: 'not-allowed',
@@ -351,13 +351,13 @@ const styles = {
   },
   loginText: {
     textAlign: 'center',
-    color: 'rgba(255,255,255,0.45)',
+    color: 'var(--sm-surface-45)',
     fontSize: '14px',
     marginTop: '20px',
     marginBottom: 0,
   },
   link: {
-    color: '#a5b4fc',
+    color: 'var(--sm-indigo-muted)',
     textDecoration: 'none',
     fontWeight: '500',
   },

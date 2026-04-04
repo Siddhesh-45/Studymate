@@ -14,7 +14,7 @@ function Toast({ toasts, removeToast }) {
           <span style={{ fontSize: '16px' }}>
             {t.type === 'success' ? '✅' : t.type === 'warn' ? '⚠️' : '❌'}
           </span>
-          <span style={{ flex: 1, fontSize: '13px', color: '#e2e8f0' }}>{t.message}</span>
+          <span style={{ flex: 1, fontSize: '13px', color: 'var(--sm-text, #e2e8f0)' }}>{t.message}</span>
           <button onClick={() => removeToast(t.id)} style={S.toastClose}>×</button>
         </div>
       ))}
@@ -169,7 +169,7 @@ export default function SelectChapters() {
       ) : courses.length === 0 ? (
         <div style={S.centerState}>
           <div style={{ fontSize: '48px', marginBottom: '12px' }}>📭</div>
-          <p style={{ color: '#e2e8f0', fontSize: '16px', fontWeight: 700, marginBottom: '6px' }}>
+          <p style={{ color: 'var(--sm-text, #e2e8f0)', fontSize: '16px', fontWeight: 700, marginBottom: '6px' }}>
             No courses selected
           </p>
           <p style={S.stateText}>Go back to "My Courses" to add courses first.</p>
@@ -202,7 +202,7 @@ export default function SelectChapters() {
                       return (
                         <div key={chap._id} style={{
                           ...S.chapterRow,
-                          background: isSelected ? 'rgba(99,102,241,0.08)' : 'rgba(255,255,255,0.03)',
+                          background: isSelected ? 'rgba(99,102,241,0.08)' : 'var(--sm-surface-3)',
                           borderColor: isSelected ? 'rgba(99,102,241,0.4)' : 'transparent'
                         }}>
                           <label style={S.checkboxLabel}>
@@ -269,41 +269,41 @@ export default function SelectChapters() {
 const S = {
   page:         { maxWidth: '1000px', margin: '0 auto', fontFamily: 'Segoe UI, sans-serif' },
   header:       { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '32px' },
-  title:        { fontSize: '28px', fontWeight: '800', color: '#f1f5f9', margin: 0, letterSpacing: '-0.5px' },
-  subtitle:     { color: 'rgba(255,255,255,0.45)', fontSize: '14px', marginTop: '6px' },
-  statPill:     { background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '20px', padding: '6px 14px', color: '#a5b4fc', fontSize: '13px', fontWeight: '600', alignSelf: 'center' },
+  title:        { fontSize: '28px', fontWeight: '800', color: 'var(--sm-text, #f1f5f9)', margin: 0, letterSpacing: '-0.5px' },
+  subtitle:     { color: 'var(--sm-surface-45)', fontSize: '14px', marginTop: '6px' },
+  statPill:     { background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '20px', padding: '6px 14px', color: 'var(--sm-indigo-muted)', fontSize: '13px', fontWeight: '600', alignSelf: 'center' },
   
-  centerState:  { textAlign: 'center', padding: '80px 20px', background: 'rgba(255,255,255,0.03)', borderRadius: '16px', border: '1px dashed rgba(255,255,255,0.1)' },
-  stateText:    { color: 'rgba(255,255,255,0.4)', fontSize: '14px' },
+  centerState:  { textAlign: 'center', padding: '80px 20px', background: 'var(--sm-surface-3)', borderRadius: '16px', border: '1px dashed var(--sm-surface-10)' },
+  stateText:    { color: 'var(--sm-surface-40)', fontSize: '14px' },
   spinnerLg:    { width: '40px', height: '40px', border: '3px solid rgba(99,102,241,0.2)', borderTopColor: '#6366f1', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' },
   
   contentLayout:{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' },
   mainSection:  { flex: 1, minWidth: '400px', display: 'flex', flexDirection: 'column', gap: '20px' },
   sidebar:      { width: '300px', flexShrink: 0 },
 
-  courseCard:   { background: 'rgba(255,255,255,0.04)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden' },
-  courseHeader: { background: 'rgba(0,0,0,0.2)', padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-  courseTitle:  { margin: 0, color: '#e2e8f0', fontSize: '16px', fontWeight: '700' },
-  chapCount:    { color: 'rgba(255,255,255,0.4)', fontSize: '13px', fontWeight: '600' },
+  courseCard:   { background: 'var(--sm-surface-4)', borderRadius: '16px', border: '1px solid var(--sm-surface-8)', overflow: 'hidden' },
+  courseHeader: { background: 'rgba(0,0,0,0.2)', padding: '16px 20px', borderBottom: '1px solid var(--sm-surface-6)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+  courseTitle:  { margin: 0, color: 'var(--sm-text, #e2e8f0)', fontSize: '16px', fontWeight: '700' },
+  chapCount:    { color: 'var(--sm-surface-40)', fontSize: '13px', fontWeight: '600' },
   
   chapterList:  { padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '8px' },
   chapterRow:   { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderRadius: '10px', transition: 'all 0.2s', border: '1px solid transparent' },
   checkboxLabel:{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', flex: 1 },
   checkbox:     { width: '18px', height: '18px', accentColor: '#6366f1', cursor: 'pointer' },
-  chapterTitle: { color: '#e2e8f0', fontSize: '15px', fontWeight: '500' },
+  chapterTitle: { color: 'var(--sm-text, #e2e8f0)', fontSize: '15px', fontWeight: '500' },
   
   deadlineWrapper:{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,0,0,0.2)', padding: '6px 12px', borderRadius: '8px' },
-  deadlineBox:  { fontSize: '12px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', fontWeight: '600', letterSpacing: '0.5px' },
+  deadlineBox:  { fontSize: '12px', color: 'var(--sm-surface-50)', textTransform: 'uppercase', fontWeight: '600', letterSpacing: '0.5px' },
   dateInput:    { background: 'transparent', border: 'none', color: '#6366f1', outline: 'none', fontSize: '14px', fontWeight: '600', fontFamily: 'inherit', colorScheme: 'dark' },
   
-  summaryCard:  { position: 'sticky', top: '24px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '24px' },
-  summaryTitle: { margin: '0 0 16px 0', color: '#e2e8f0', fontSize: '16px', fontWeight: '700' },
-  summaryText:  { color: 'rgba(255,255,255,0.6)', fontSize: '14px', lineHeight: '1.5', marginBottom: '24px' },
+  summaryCard:  { position: 'sticky', top: '24px', background: 'var(--sm-surface-4)', border: '1px solid var(--sm-surface-8)', borderRadius: '16px', padding: '24px' },
+  summaryTitle: { margin: '0 0 16px 0', color: 'var(--sm-text, #e2e8f0)', fontSize: '16px', fontWeight: '700' },
+  summaryText:  { color: 'var(--sm-surface-60)', fontSize: '14px', lineHeight: '1.5', marginBottom: '24px' },
   saveBtn:      { width: '100%', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', border: 'none', borderRadius: '10px', padding: '14px', color: '#fff', fontSize: '15px', fontWeight: '700', cursor: 'pointer', display: 'flex', justifyContent: 'center' },
-  backBtn:      { marginTop: '20px', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '8px', padding: '10px 20px', color: '#fff', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
-  sidebarBackBtn:{ width: '100%', marginTop: '12px', background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px', color: '#e2e8f0', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
+  backBtn:      { marginTop: '20px', background: 'var(--sm-surface-10)', border: 'none', borderRadius: '8px', padding: '10px 20px', color: '#fff', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
+  sidebarBackBtn:{ width: '100%', marginTop: '12px', background: 'transparent', border: '1px solid var(--sm-surface-10)', borderRadius: '10px', padding: '12px', color: 'var(--sm-text, #e2e8f0)', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
   
   toastContainer:{ position: 'fixed', top: '20px', right: '20px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '340px' },
   toast:         { display: 'flex', alignItems: 'center', gap: '10px', backdropFilter: 'blur(12px)', border: '1px solid', borderRadius: '10px', padding: '12px 14px', boxShadow: '0 4px 20px rgba(0,0,0,0.4)', animation: 'slideIn 0.25s ease' },
-  toastClose:    { background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: 0 },
+  toastClose:    { background: 'none', border: 'none', color: 'var(--sm-surface-50)', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: 0 },
 };

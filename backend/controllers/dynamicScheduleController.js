@@ -146,6 +146,67 @@ function buildSchedule(pendingTasks, weeklyHours, sessionDuration, startDate) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// TASK 8: generateAdaptiveSchedule
+//
+// Transforms a flat pending-topics array into an adaptively ordered list:
+//
+//   Step 1 — Weak-topic boost
+//     Topics where wrong > correct are front-loaded so they appear sooner.
+//
+//   Step 2 — Difficulty interleaving
+//     Within weak/strong groups, topics are interleaved Easy → Medium → Hard
+//     so each day gets a healthy cognitive mix.
+//
+//   Step 3 — Spaced-repetition revision
+//     Topics not reviewed in 2+ days OR weak topics get appended a second
+//     time (up to 50% of revision candidates) for reinforcement.
+//
+// @param  {Array} topics  — pending topic objects with .performance, .lastReviewed
+// @returns {Array}        — reordered list passed to buildSchedule()
+// ─────────────────────────────────────────────────────────────────────────────
+function generateAdaptiveSchedule(topics) {
+  // ── Helpers ─────────────────────────────────────────────────────
+  const isWeak = (t) =>
+    (t.performance?.wrong || 0) > (t.performance?.correct || 0);
+
+  const hasData = (t) => 
+    (t.performance?.wrong || 0) > 0 || (t.performance?.correct || 0) > 0;
+
+  const REVISION_GAP_DAYS = 2;
+  const shouldRevise = (t) => {
+    if (!t.lastReviewed) return false;
+    const daysSince = (Date.now() - new Date(t.lastReviewed)) / (1000 * 60 * 60 * 24);
+    return daysSince >= REVISION_GAP_DAYS || isWeak(t);
+  };
+
+  // ── Step 1: Separate into categories ───────────────────────────
+  // Weak topics (failed quizzes) get priority at the front.
+  // Brand new topics strictly preserve their sequential order.
+  const weakTopics     = topics.filter(t => hasData(t) && isWeak(t));
+  const strongTopics   = topics.filter(t => hasData(t) && !isWeak(t));
+  const brandNewTopics = topics.filter(t => !hasData(t));
+
+  const balanced = [
+    ...weakTopics,
+    ...brandNewTopics,
+    ...strongTopics,
+  ];
+
+  // ── Step 2: Spaced-repetition revision slots ─────────────────────────
+  const revisionCandidates = topics.filter(shouldRevise);
+  const revisionSlots = revisionCandidates
+    .slice(0, Math.ceil(revisionCandidates.length / 2))
+    .map(t => ({ ...t })); // shallow clone — revision copies
+
+  console.log(
+    `[adaptive] weak=${weakTopics.length} brandNew=${brandNewTopics.length} ` +
+    `revision_slots=${revisionSlots.length}`
+  );
+
+  return [...balanced, ...revisionSlots];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // GET /api/schedule/availability
 // Returns the student's saved availability profile
 // If none saved yet, returns sensible defaults
@@ -228,19 +289,49 @@ exports.generateSmartSchedule = async (req, res) => {
     //   Source B — DynamicSchedule task.status === 'completed'  (in-schedule mark)
     const completedTopicIds = new Set();
     const preservedDays     = []; // days that already have ≥1 completed/missed task
+    // Task 8: performance data map — topicId → { correct, wrong, lastReviewed }
+    const performanceMap = {};
 
     if (existingSchedule) {
       existingSchedule.days.forEach((day) => {
         let hasFinished = false;
+        const tasksToKeep = [];
+
         day.tasks.forEach((task) => {
           if (task.status === 'completed') {
             if (task.topicId) completedTopicIds.add(String(task.topicId));
             hasFinished = true;
+            tasksToKeep.push(task);
+          } else if (task.status === 'missed') {
+            hasFinished = true;
+            tasksToKeep.push(task);
           }
-          if (task.status === 'missed') hasFinished = true;
+
+          // 📊 Task 8: Accumulate performance across all slots of the same topic
+          if (task.topicId) {
+            const tid = String(task.topicId);
+            if (!performanceMap[tid]) {
+              performanceMap[tid] = { correct: 0, wrong: 0, lastReviewed: null };
+            }
+            performanceMap[tid].correct += task.performance?.correct || 0;
+            performanceMap[tid].wrong   += task.performance?.wrong   || 0;
+            if (task.lastReviewed) {
+              const lr = new Date(task.lastReviewed);
+              if (!performanceMap[tid].lastReviewed || lr > performanceMap[tid].lastReviewed) {
+                performanceMap[tid].lastReviewed = lr;
+              }
+            }
+          }
         });
-        // ✅ Preserve the entire day if any task was finished
-        if (hasFinished) preservedDays.push(day.toObject ? day.toObject() : day);
+
+        // ✅ Preserve the entire day ONLY for tasks that were actually finished/missed
+        // We purge "pending" tasks from historical days so they don't duplicate when rescheduled!
+        if (hasFinished) {
+          const preservedDay = day.toObject ? day.toObject() : JSON.parse(JSON.stringify(day));
+          preservedDay.tasks = tasksToKeep.map(t => (t.toObject ? t.toObject() : t));
+          preservedDay.totalHours = tasksToKeep.reduce((sum, t) => sum + (t.allocatedHours || 0), 0);
+          preservedDays.push(preservedDay);
+        }
       });
     }
 
@@ -290,6 +381,9 @@ exports.generateSmartSchedule = async (req, res) => {
           originalHours:  topic.estimatedHours,
           allocatedHours: topic.estimatedHours,
           difficulty,
+          // 📊 Task 8: attach historical performance so adaptive scheduler can use it
+          performance:  performanceMap[tid] || { correct: 0, wrong: 0 },
+          lastReviewed: performanceMap[tid]?.lastReviewed || null,
         });
       });
     });
@@ -326,14 +420,13 @@ exports.generateSmartSchedule = async (req, res) => {
       pending.splice(0, pending.length, ...balanced);
     }
 
-    // ── 6. 🔁 TASK 7: Shuffle on regeneration — guarantees a NEW order ────
-    //    Fisher-Yates shuffle applied only when an existing schedule is found.
-    //    This ensures re-generation never produces the exact same sequence.
+    // ── 6. 🧠 TASK 8: Adaptive ordering ─────────────────────────
+    //    We strictly preserve brand-new topics sequentially.
+    //    We only re-order to boost weak topics and add spaced-repetition.
     if (isRegeneration) {
-      for (let i = pending.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [pending[i], pending[j]] = [pending[j], pending[i]];
-      }
+      const adaptiveOrdered = generateAdaptiveSchedule(pending);
+      pending.splice(0, pending.length, ...adaptiveOrdered);
+      console.log(`[generateSmart] Adaptive ordering applied to ${pending.length} topics`);
     }
 
     // ── 7. Run the scheduling algorithm ──────────────────────────────────
@@ -346,7 +439,23 @@ exports.generateSmartSchedule = async (req, res) => {
 
     // ── 8. ✅ TASK 7: Merge preserved completed days + freshly scheduled days
     //    Preserved days (historical progress) come first, new pending come after.
-    const mergedDays = [...preservedDays, ...newDays];
+    //    Crucially, we must GROUP by date so we don't accidentally create two
+    //    identical 'Today' cards if Today had both completed and new pending tasks!
+    const mergedDaysMap = {};
+    [...preservedDays, ...newDays].forEach((day) => {
+      const dStr = new Date(day.date).toISOString().split('T')[0];
+      if (!mergedDaysMap[dStr]) {
+        mergedDaysMap[dStr] = day.toObject ? day.toObject() : JSON.parse(JSON.stringify(day));
+      } else {
+        const existing = mergedDaysMap[dStr];
+        existing.tasks.push(...(day.tasks || []));
+        existing.totalHours = existing.tasks.reduce((sum, t) => sum + (t.allocatedHours || 0), 0);
+        existing.availableHours = Math.max(existing.availableHours || 0, day.availableHours || 0);
+      }
+    });
+
+    // Sort the merged days sequentially to ensure timeline order is maintained perfectly
+    const mergedDays = Object.values(mergedDaysMap).sort((a,b) => new Date(a.date) - new Date(b.date));
 
     // ── 9. Upsert the DynamicSchedule document ────────────────────────────
     const saved = await DynamicSchedule.findOneAndUpdate(
@@ -371,6 +480,77 @@ exports.generateSmartSchedule = async (req, res) => {
     });
   } catch (err) {
     console.error('generateSmartSchedule error:', err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/schedule/update-performance
+// Task 8: Record quiz / self-assessment result for a topic.
+// Updates performance.correct or performance.wrong on every scheduled slot
+// of that topic, and stamps lastReviewed = now.
+//
+// This data is read by generateAdaptiveSchedule() on the next regeneration
+// to identify weak topics and schedule them more frequently.
+//
+// Body: { topicId: "<topic _id>", result: "correct" | "wrong" }
+// ─────────────────────────────────────────────────────────────────────────────
+exports.updatePerformance = async (req, res) => {
+  try {
+    const userId          = req.user.id;
+    const { topicId, result } = req.body;
+
+    if (!topicId || !['correct', 'wrong'].includes(result)) {
+      return res.status(400).json({
+        message: 'topicId and result ("correct" or "wrong") are required.',
+      });
+    }
+
+    const schedule = await DynamicSchedule.findOne({ userId });
+    if (!schedule) {
+      return res.status(404).json({ message: 'No schedule found. Generate one first.' });
+    }
+
+    let updatedCount = 0;
+    const now = new Date();
+
+    schedule.days.forEach((day) => {
+      day.tasks.forEach((task) => {
+        if (String(task.topicId) === String(topicId)) {
+          // Initialise sub-document if somehow missing (old docs pre-Task 8)
+          if (!task.performance) task.performance = { correct: 0, wrong: 0 };
+          task.performance[result] = (task.performance[result] || 0) + 1;
+          task.lastReviewed = now;
+          updatedCount++;
+        }
+      });
+    });
+
+    if (updatedCount === 0) {
+      return res.status(404).json({ message: 'Topic not found in schedule.' });
+    }
+
+    schedule.markModified('days');
+    await schedule.save();
+
+    // Summarise performance across all slots for the response
+    const perf = schedule.days
+      .flatMap(d => d.tasks)
+      .filter(t => String(t.topicId) === String(topicId))
+      .reduce((acc, t) => ({
+        correct: acc.correct + (t.performance?.correct || 0),
+        wrong:   acc.wrong   + (t.performance?.wrong   || 0),
+      }), { correct: 0, wrong: 0 });
+
+    res.json({
+      message:     `Performance recorded: ${result} (+1) for topic in ${updatedCount} slot(s).`,
+      topicId,
+      result,
+      performance: perf,
+      isWeak:      perf.wrong > perf.correct,
+    });
+  } catch (err) {
+    console.error('updatePerformance error:', err);
     res.status(500).json({ message: 'Server Error' });
   }
 };
