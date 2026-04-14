@@ -42,11 +42,23 @@ app.get('/', (req, res) => {
 
 // ─── Database Connection ──────────────────────────────────────────────────────
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
+  .then(async () => {
     console.log('MongoDB connected successfully');
-    // NOTE: No predefined course seeding.
-    // Admin imports courses via YouTube playlist.
-    // Students select from whatever admin has imported.
+    
+    // Auto-seed quotes if they are missing (e.g. fresh Cloud DB)
+    try {
+      const Quote = require('./models/Quote');
+      const count = await Quote.countDocuments();
+      if (count === 0) {
+        console.log('Quotes collection is empty. Auto-seeding 60 quotes...');
+        const quotesData = require('./seedQuotesData.json'); // We will create this JSON
+        await Quote.insertMany(quotesData);
+        console.log('Quotes seeded successfully!');
+      }
+    } catch (err) {
+      console.error('Auto-seed error:', err);
+    }
+
     startReminderCron(); // ← Start email reminder cron after DB is ready
   })
   .catch(err => console.error('MongoDB connection error:', err));

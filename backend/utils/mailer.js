@@ -5,20 +5,26 @@ const nodemailer = require('nodemailer');
 // For Gmail: use an App Password (not your real password)
 //   → Google Account → Security → 2FA enabled → App Passwords → create one
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  family: 4, // Force IPv4 (fixes IPv6 ENETUNREACH errors on Render)
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
 });
 
+// Verify transporter connection
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('Email Transporter Configuration Error:', error);
+  } else {
+    console.log('Email Server is ready to send messages.');
+  }
+});
+
 // ─── Send reminder email ──────────────────────────────────────────────────────
-// @param {string} to         - student email
-// @param {string} name       - student name
-// @param {string} taskTitle  - scheduled task title
-// @param {Date}   deadline   - when the task was due
-// @param {string} taskId     - task _id (for deep-link)
-// ─────────────────────────────────────────────────────────────────────────────
 const sendReminderEmail = async (to, name, taskTitle, deadline, taskId) => {
   const formattedDate = new Date(deadline).toLocaleString('en-IN', {
     dateStyle: 'medium',
@@ -87,12 +93,17 @@ const sendReminderEmail = async (to, name, taskTitle, deadline, taskId) => {
   </body>
   </html>`;
 
-  await transporter.sendMail({
-    from: `"StudyMate 📚" <${process.env.EMAIL_USER}>`,
-    to,
-    subject: `⏰ Reminder: "${taskTitle}" is still pending`,
-    html,
-  });
+  try {
+    await transporter.sendMail({
+      from: `"StudyMate 📚" <${process.env.EMAIL_USER}>`,
+      to,
+      subject: `⏰ Reminder: "${taskTitle}" is still pending`,
+      html,
+    });
+    console.log(`Reminder email sent successfully to ${to}`);
+  } catch (err) {
+    console.error(`Failed to send reminder email to ${to}:`, err);
+  }
 };
 
 module.exports = { sendReminderEmail };
