@@ -229,7 +229,19 @@ const authAnimations = `
   }
   .auth-btn-hover:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(99,102,241,0.5) !important;
+    box-shadow: 0 8px 25px rgba(147, 51, 234, 0.5) !important;
+  }
+  .input-glass:-webkit-autofill,
+  .input-glass:-webkit-autofill:hover, 
+  .input-glass:-webkit-autofill:focus, 
+  .input-glass:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #0d0d0d inset !important;
+    -webkit-text-fill-color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+  .input-glass::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+    opacity: 1;
   }
 `;
 
@@ -359,16 +371,17 @@ const styles = {
     gap: '6px',
   },
   label: {
-    color: 'var(--sm-surface-70)',
-    fontSize: '13px',
-    fontWeight: '500',
+    color: '#ffffff',
+    fontSize: '14px',
+    fontWeight: '600',
+    marginBottom: '2px',
   },
   input: {
-    background: 'rgba(255, 255, 255, 0.04)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
-    borderRadius: '12px',
+    background: '#0d0d0d',
+    border: '1px solid rgba(255, 255, 255, 0.15)',
+    borderRadius: '10px',
     padding: '14px 16px',
-    color: '#e2e8f0',
+    color: '#ffffff',
     fontSize: '15px',
     outline: 'none',
     transition: 'all 0.3s ease',
@@ -396,18 +409,18 @@ const styles = {
     minWidth: '44px',
   },
   btn: {
-    background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT2})`,
+    background: '#9333ea', // vibrant purple
     border: 'none',
-    borderRadius: '12px',
-    padding: '16px',
+    borderRadius: '10px',
+    padding: '14px',
     color: '#fff',
     fontSize: '15px',
     fontWeight: '700',
     letterSpacing: '0.5px',
     cursor: 'pointer',
-    marginTop: '8px',
+    marginTop: '12px',
     transition: 'all 0.3s ease',
-    boxShadow: `0 4px 15px ${ACCENT}44`,
+    boxShadow: '0 4px 15px rgba(147, 51, 234, 0.4)',
   },
   btnDisabled: {
     background: 'var(--sm-surface-15)',
