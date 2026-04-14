@@ -278,8 +278,8 @@ const S = {
   spinnerLg:    { width: '40px', height: '40px', border: '3px solid rgba(99,102,241,0.2)', borderTopColor: '#6366f1', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' },
   
   contentLayout:{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' },
-  mainSection:  { flex: 1, minWidth: '400px', display: 'flex', flexDirection: 'column', gap: '20px' },
-  sidebar:      { width: '300px', flexShrink: 0 },
+  mainSection:  { flex: 1, minWidth: '280px', display: 'flex', flexDirection: 'column', gap: '20px' },
+  sidebar:      { width: '300px', flexShrink: 0, minWidth: 0 },
 
   courseCard:   { background: 'var(--sm-surface-4)', borderRadius: '16px', border: '1px solid var(--sm-surface-8)', overflow: 'hidden' },
   courseHeader: { background: 'rgba(0,0,0,0.2)', padding: '16px 20px', borderBottom: '1px solid var(--sm-surface-6)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
@@ -287,7 +287,7 @@ const S = {
   chapCount:    { color: 'var(--sm-surface-40)', fontSize: '13px', fontWeight: '600' },
   
   chapterList:  { padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '8px' },
-  chapterRow:   { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderRadius: '10px', transition: 'all 0.2s', border: '1px solid transparent' },
+  chapterRow:   { display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', padding: '12px 16px', borderRadius: '10px', transition: 'all 0.2s', border: '1px solid transparent' },
   checkboxLabel:{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', flex: 1 },
   checkbox:     { width: '18px', height: '18px', accentColor: '#6366f1', cursor: 'pointer' },
   chapterTitle: { color: 'var(--sm-text, #e2e8f0)', fontSize: '15px', fontWeight: '500' },

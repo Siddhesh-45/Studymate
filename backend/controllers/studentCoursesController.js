@@ -67,8 +67,11 @@ exports.getMyCourses = async (req, res) => {
       .populate('courseId')
       .sort({ createdAt: -1 });
 
+    // FILTER NULL COURSES
+    const validEnrolments = enrolments.filter(c => c.courseId !== null);
+
     // Enrich each enrolment with computed progress stats
-    const courses = enrolments.map((entry) => {
+    const courses = validEnrolments.map((entry) => {
       const totalLessons     = entry.courseId?.topics?.length ?? 0;
       const completedCount   = entry.completedLessons?.length ?? 0;
       const progress         = totalLessons > 0
@@ -112,7 +115,10 @@ exports.getMyCoursesById = async (req, res) => {
       .populate('courseId')
       .sort({ createdAt: -1 });
 
-    res.json({ courses: myCourses });
+    // FILTER NULL COURSES
+    const validCourses = myCourses.filter(c => c.courseId !== null);
+
+    res.json({ courses: validCourses });
   } catch (err) {
     console.error('getMyCoursesById error:', err);
     res.status(500).json({ message: 'Server error fetching courses.' });

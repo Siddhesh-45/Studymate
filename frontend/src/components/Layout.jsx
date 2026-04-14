@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
@@ -17,6 +18,11 @@ export default function Layout({ children }) {
   const user      = JSON.parse(localStorage.getItem('user') || '{}');
   const isAdmin   = user.role === 'admin';
   const { mode, toggleTheme } = useTheme();
+  const isDark = mode === 'dark';
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Close sidebar on route change
+  useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -45,9 +51,56 @@ export default function Layout({ children }) {
 
   return (
     <div style={S.wrapper}>
+      {/* ── Mobile responsive CSS ───────────────────── */}
+      <style>{`
+        .sm-sidebar { flex-shrink: 0; }
+        .sm-topbar  { display: none; }
+        @media (max-width: 767px) {
+          .sm-sidebar {
+            position: fixed !important;
+            top: 0; left: 0; bottom: 0;
+            z-index: 50;
+            transform: translateX(-100%);
+            transition: transform 0.28s ease !important;
+            height: 100% !important;
+          }
+          .sm-sidebar.sm-open { transform: translateX(0); }
+          .sm-main { padding-top: 56px !important; }
+          .sm-topbar { display: flex !important; }
+        }
+      `}</style>
+
+      {/* Mobile dark overlay */}
+      {mobileOpen && (
+        <div
+          onClick={() => setMobileOpen(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 40,
+            background: 'rgba(0,0,0,0.52)', backdropFilter: 'blur(2px)',
+          }}
+        />
+      )}
+
+      {/* Mobile top bar — hidden on desktop via CSS */}
+      <div className="sm-topbar" style={{
+        position: 'fixed', top: 0, left: 0, right: 0, height: 56, zIndex: 30,
+        background: isDark ? 'rgba(10,15,35,0.97)' : '#ffffff',
+        borderBottom: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0',
+        alignItems: 'center', padding: '0 16px', gap: 12,
+        backdropFilter: 'blur(16px)',
+      }}>
+        <button
+          onClick={() => setMobileOpen(v => !v)}
+          style={{ background:'none', border:'none', cursor:'pointer', fontSize: 22,
+            color: isDark ? '#94a3b8' : '#64748b', padding: '4px 8px', borderRadius: 6 }}
+        >☰</button>
+        <span style={{ fontSize: 20 }}>📚</span>
+        <span style={{ fontWeight: 700, fontSize: 16,
+          color: isDark ? '#e2e8f0' : '#1e293b' }}>StudyMate</span>
+      </div>
 
       {/* ── Sidebar ──────────────────────────────────────────────────────── */}
-      <aside style={S.sidebar}>
+      <aside className={`sm-sidebar${mobileOpen ? ' sm-open' : ''}`} style={S.sidebar}>
 
         {/* Brand */}
         <div style={S.brand}>
@@ -109,6 +162,7 @@ export default function Layout({ children }) {
 
       {/* ── Main content ─────────────────────────────────────────────────── */}
       <motion.main
+        className="sm-main"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}

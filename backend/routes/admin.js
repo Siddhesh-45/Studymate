@@ -6,6 +6,7 @@ const adminController = require('../controllers/adminController');
 const adminContentController = require('../controllers/adminContentController');
 const adminCatalogController = require('../controllers/adminCatalogController');
 const analyticsController = require('../controllers/analyticsController');
+const adminDashboardController = require('../controllers/adminDashboardController');
 
 // All routes here require a valid admin token
 router.use((req, res, next) => {
@@ -52,5 +53,12 @@ router.get('/course-completion',  analyticsController.getCourseCompletion);
 router.get('/popular-courses',    analyticsController.getPopularCourses);
 router.get('/user-growth',        analyticsController.getUserGrowth);
 router.get('/learning-patterns',  analyticsController.getLearningPatterns);
+
+// ── Real-Data Admin Dashboard ────────────────────────────────────────────────
+router.get('/dashboard/stats',         adminDashboardController.getDashboardStats);
+router.get('/dashboard/recent-users',  adminDashboardController.getRecentUsers);
+router.get('/dashboard/all-users',     adminDashboardController.getAllUsersWithStats);
+router.get('/dashboard/popular-courses', adminDashboardController.getPopularCourses);
+router.get('/dashboard/user-growth',   adminDashboardController.getUserGrowth);
 
 module.exports = router;

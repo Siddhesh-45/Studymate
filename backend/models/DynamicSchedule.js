@@ -13,6 +13,7 @@ const mongoose = require('mongoose');
 // ─────────────────────────────────────────────────────────────────────────────
 
 const scheduledTaskSchema = new mongoose.Schema({
+  date:           { type: String }, // YYYY-MM-DD
   courseId:       { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
   courseName:     { type: String },
   topicId:        { type: mongoose.Schema.Types.ObjectId },
@@ -47,7 +48,10 @@ const scheduledTaskSchema = new mongoose.Schema({
   },
 
   // Date the student last reviewed this topic (used for spaced-repetition gap)
-  lastReviewed: { type: Date, default: null },
+  // ── Email reminder tracking ───────────────────────────────────────────────
+  // Stores when the last reminder was sent for this task.
+  // Cron checks this to enforce the 2-hour gap between reminders.
+  lastReminderSent: { type: Date, default: null },
 
 }, { _id: true });
 

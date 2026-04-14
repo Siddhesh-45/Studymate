@@ -6,24 +6,28 @@ import Register from './pages/Register';
 
 // Student pages
 import Dashboard   from './pages/Dashboard';
-import AllCourses  from './pages/AllCourses';    // ← TASK 4: browse all courses
-import MyCourses   from './pages/MyCourses';     // ← TASK 5: student's selected courses
+import AllCourses  from './pages/AllCourses';
+import MyCourses   from './pages/MyCourses';
 import Schedule    from './pages/Schedule';
 import Quiz        from './pages/Quiz';
 import PracticeHub from './pages/PracticeHub';
 import CourseDetail  from './pages/CourseDetail';
 
-// Admin pages
-import AdminDashboard from './pages/AdminDashboard';
-import AdminUsers     from './pages/AdminUsers';
-import AdminContent   from './pages/AdminContent';
-import Courses        from './pages/Courses';
+// Admin pages — new premium UI
+import AdminDashboard  from './pages/AdminDashboard';
+import AdminCourses    from './pages/AdminCourses';
+import AdminAddCourse  from './pages/AdminAddCourse';
+import AdminStudents   from './pages/AdminStudents';
+import AdminAnalytics  from './pages/AdminAnalytics';
+import AdminSettings   from './pages/AdminSettings';
 
-// Shared
-import Layout from './components/Layout';
+// Legacy admin pages (kept for backward compat)
+import AdminContent from './pages/AdminContent';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ProtectedRoute — redirects to login if not authenticated
+// Shared layouts
+import Layout       from './components/Layout';
+import AdminLayout  from './components/AdminLayout';
+
 // ─────────────────────────────────────────────────────────────────────────────
 function ProtectedRoute({ children, requiredRole }) {
   const token = localStorage.getItem('token');
@@ -56,14 +60,12 @@ export default function App() {
           </ProtectedRoute>
         }/>
 
-        {/* PAGE 1: All courses — student browses and adds */}
         <Route path="/all-courses" element={
           <ProtectedRoute>
             <Layout><AllCourses /></Layout>
           </ProtectedRoute>
         }/>
 
-        {/* PAGE 2: My courses — student's personal selected list */}
         <Route path="/my-courses" element={
           <ProtectedRoute>
             <Layout><MyCourses /></Layout>
@@ -75,47 +77,74 @@ export default function App() {
             <Layout><Schedule /></Layout>
           </ProtectedRoute>
         }/>
+
         <Route path="/course/:courseId" element={
           <ProtectedRoute>
             <Layout><CourseDetail /></Layout>
           </ProtectedRoute>
         }/>
+
         <Route path="/quiz" element={
           <ProtectedRoute>
             <Layout><PracticeHub /></Layout>
           </ProtectedRoute>
         }/>
+
         <Route path="/quiz/:courseId/:lessonId" element={
           <ProtectedRoute>
             <Layout><Quiz /></Layout>
           </ProtectedRoute>
         }/>
 
-        {/* ── Admin routes ────────────────────────────────────────────────── */}
+        {/* ── Admin routes (new premium UI) ─────────────────────────────── */}
         <Route path="/admin" element={
           <ProtectedRoute requiredRole="admin">
-            <Layout><AdminDashboard /></Layout>
+            <AdminLayout><AdminDashboard /></AdminLayout>
           </ProtectedRoute>
         }/>
-        <Route path="/admin/users" element={
-          <ProtectedRoute requiredRole="admin">
-            <Layout><AdminUsers /></Layout>
-          </ProtectedRoute>
-        }/>
+
         <Route path="/admin/courses" element={
           <ProtectedRoute requiredRole="admin">
-            <Layout><Courses /></Layout>
+            <AdminLayout><AdminCourses /></AdminLayout>
           </ProtectedRoute>
         }/>
+
+        <Route path="/admin/add-course" element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminLayout><AdminAddCourse /></AdminLayout>
+          </ProtectedRoute>
+        }/>
+
+        <Route path="/admin/users" element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminLayout><AdminStudents /></AdminLayout>
+          </ProtectedRoute>
+        }/>
+
+
+
+        <Route path="/admin/analytics" element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminLayout><AdminAnalytics /></AdminLayout>
+          </ProtectedRoute>
+        }/>
+
+        <Route path="/admin/settings" element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminLayout><AdminSettings /></AdminLayout>
+          </ProtectedRoute>
+        }/>
+
+        {/* Legacy admin content route */}
         <Route path="/admin/content" element={
           <ProtectedRoute requiredRole="admin">
-            <Layout><AdminContent /></Layout>
+            <AdminLayout><AdminContent /></AdminLayout>
           </ProtectedRoute>
         }/>
 
         {/* ── Defaults ──────────────────────────────────────────────────── */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="/"  element={<Navigate to="/dashboard" replace />} />
+        <Route path="*"  element={<Navigate to="/login" replace />} />
 
       </Routes>
     </BrowserRouter>

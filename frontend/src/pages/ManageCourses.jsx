@@ -184,8 +184,8 @@ const S = {
   spinnerLg:    { width: '40px', height: '40px', border: '3px solid rgba(99,102,241,0.2)', borderTopColor: '#6366f1', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' },
   
   layout:       { display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' },
-  main:         { flex: 1, minWidth: '400px', display: 'flex', flexDirection: 'column', gap: '16px' },
-  sidebar:      { width: '300px', flexShrink: 0 },
+  main:         { flex: 1, minWidth: 0, minWidth: '280px', display: 'flex', flexDirection: 'column', gap: '16px' },
+  sidebar:      { width: '300px', flexShrink: 0, minWidth: 0 },
   
   card:         { borderRadius: '12px', border: '1px solid', overflow: 'hidden', transition: 'all 0.2s ease', position: 'relative' },
   cardClickArea:{ display: 'flex', alignItems: 'center', padding: '16px 20px', cursor: 'pointer', gap: '16px' },

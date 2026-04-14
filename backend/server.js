@@ -21,6 +21,7 @@ const quizRoutes           = require('./routes/quiz');         // GET /api/quiz/
 const availabilityRoutes   = require('./routes/availability'); // GET|POST /api/availability
 const progressRoutes       = require('./routes/progressRoutes');
 const quotesRoutes         = require('./routes/quotes');
+const { startReminderCron } = require('./jobs/reminderCron');
 
 // ─── Mount Routes ─────────────────────────────────────────────────────────────
 app.use('/api/auth',            authRoutes);
@@ -46,6 +47,7 @@ mongoose.connect(process.env.MONGO_URI)
     // NOTE: No predefined course seeding.
     // Admin imports courses via YouTube playlist.
     // Students select from whatever admin has imported.
+    startReminderCron(); // ← Start email reminder cron after DB is ready
   })
   .catch(err => console.error('MongoDB connection error:', err));
 
@@ -53,3 +55,23 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+// ─── Auto Cleanup Cron (runs every 24 hours) ───────────────────────────────────
+const cleanupOrphanCourses = async () => {
+  try {
+    const StudentCourse = require('./models/StudentCourse');
+    const studentCourses = await StudentCourse.find().populate("courseId");
+    let cleaned = 0;
+    for (let sc of studentCourses) {
+      if (!sc.courseId) {
+        await StudentCourse.findByIdAndDelete(sc._id);
+        cleaned++;
+      }
+    }
+    if (cleaned > 0) console.log(`[Cron] Cleaned up ${cleaned} orphaned StudentCourse entries.`);
+  } catch (err) {
+    console.error('[Cron] Error cleaning orphaned courses:', err);
+  }
+};
+setInterval(cleanupOrphanCourses, 24 * 60 * 60 * 1000);
+setTimeout(cleanupOrphanCourses, 10000); // Run once 10s after startup

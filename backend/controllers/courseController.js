@@ -172,12 +172,30 @@ exports.toggleTopicStatus = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 exports.deleteCourse = async (req, res) => {
   try {
-    const course = await Course.findByIdAndDelete(req.params.id);
+    const courseId = req.params.id;
+
+    // 1. Delete course
+    const course = await Course.findByIdAndDelete(courseId);
     if (!course) return res.status(404).json({ message: 'Course not found' });
-    res.json({ message: 'Course deleted successfully' });
+
+    // 2. Remove from student enrollments
+    const StudentCourse = require('../models/StudentCourse');
+    await StudentCourse.deleteMany({ courseId });
+
+    // 3. Remove from schedules
+    const DynamicSchedule = require('../models/DynamicSchedule');
+    await DynamicSchedule.updateMany(
+      {},
+      { $pull: { tasks: { courseId } } }
+    );
+
+    // 4. Remove from progress
+    await CourseProgress.deleteMany({ courseId });
+
+    res.json({ message: "Course deleted & cleaned successfully" });
   } catch (err) {
     console.error('deleteCourse error:', err);
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: 'Server Error', error: err.message });
   }
 };
 
